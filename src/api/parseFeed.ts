@@ -62,8 +62,14 @@ export function extractItemData(item: Element): FeedItemData {
     const contentEl = item.querySelector("content");
     let description = "";
     if (contentEl) {
-      // Try innerHTML first (for CDATA content)
+      // For CDATA content in XML, innerHTML should work
+      // But also try textContent as fallback
       description = contentEl.innerHTML || contentEl.textContent || "";
+
+      // If still empty, try accessing the text node directly
+      if (!description && contentEl.firstChild) {
+        description = contentEl.firstChild.textContent || "";
+      }
     }
 
     // Link is in href attribute

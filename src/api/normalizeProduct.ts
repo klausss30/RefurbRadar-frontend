@@ -30,7 +30,14 @@ export function normalizeProduct(
   const priceFromContent = extractPrice(descriptionHtml);
   const price = priceFromTitle || priceFromContent || 0;
 
+  // Extract image URL (debug if needed)
   const imageUrl = extractFirstImageSrc(descriptionHtml);
+  if (!imageUrl && descriptionHtml) {
+    console.warn(
+      "No image URL extracted from description HTML. First 200 chars:",
+      descriptionHtml.substring(0, 200)
+    );
+  }
   const sku = extractSKU(data.title) || extractSKU(descriptionHtml);
 
   // Detect category
