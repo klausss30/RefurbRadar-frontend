@@ -63,7 +63,7 @@ export function formatRelativeTime(date: Date | string): string {
   
   // Handle negative time (future dates)
   if (diffMs < 0) {
-    return '刚刚';
+    return 'Just now';
   }
   
   const diffSeconds = Math.floor(diffMs / 1000);
@@ -72,24 +72,24 @@ export function formatRelativeTime(date: Date | string): string {
   const diffDays = Math.floor(diffHours / 24);
   
   if (diffSeconds < 60) {
-    return '刚刚';
+    return 'Just now';
   } else if (diffMinutes < 60) {
-    return `${diffMinutes}分钟前`;
+    return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
   } else if (diffHours < 24) {
-    return `${diffHours}小时前`;
+    return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
   } else if (diffDays === 1) {
-    return '1天前';
+    return '1 day ago';
   } else if (diffDays < 7) {
-    return `${diffDays}天前`;
+    return `${diffDays} days ago`;
   } else if (diffDays < 30) {
     const weeks = Math.floor(diffDays / 7);
-    return `${weeks}周前`;
+    return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
   } else if (diffDays < 365) {
     const months = Math.floor(diffDays / 30);
-    return `${months}个月前`;
+    return `${months} month${months > 1 ? 's' : ''} ago`;
   } else {
     const years = Math.floor(diffDays / 365);
-    return `${years}年前`;
+    return `${years} year${years > 1 ? 's' : ''} ago`;
   }
 }
 

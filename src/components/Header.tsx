@@ -55,9 +55,9 @@ export default function Header({
     const minutes = Math.floor(age / (60 * 1000));
     const seconds = Math.floor((age % (60 * 1000)) / 1000);
     if (minutes > 0) {
-      return `${minutes}分${seconds}秒前`;
+      return `${minutes}m ${seconds}s ago`;
     }
-    return `${seconds}秒前`;
+    return `${seconds}s ago`;
   };
 
   return (
@@ -91,7 +91,7 @@ export default function Header({
                   onClick={onRefresh}
                   disabled={isLoading || isDetecting}
                   className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
-                  title="刷新缓存数据"
+                  title="Refresh cache data"
                 >
                   <svg
                     className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
@@ -106,7 +106,7 @@ export default function Header({
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                     />
                   </svg>
-                  {isLoading ? '刷新中...' : '刷新缓存'}
+                  {isLoading ? 'Refreshing...' : 'Refresh Cache'}
                 </button>
               )}
 
@@ -115,7 +115,7 @@ export default function Header({
                 <button
                   onClick={() => setShowCacheInfo(!showCacheInfo)}
                   className="px-2 py-1.5 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
-                  title="查看缓存信息"
+                  title="View cache information"
                 >
                   <svg
                     className="w-4 h-4"
@@ -135,33 +135,33 @@ export default function Header({
                 {/* Cache Info Tooltip */}
                 {showCacheInfo && (
                   <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-20 text-sm">
-                    <div className="font-semibold text-gray-900 mb-2">缓存信息</div>
+                    <div className="font-semibold text-gray-900 mb-2">Cache Information</div>
                     <div className="space-y-1.5 text-gray-600">
                       <div className="flex justify-between">
-                        <span>存储位置:</span>
+                        <span>Storage Location:</span>
                         <span className="font-mono text-xs text-gray-500">localStorage</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>缓存状态:</span>
+                        <span>Cache Status:</span>
                         <span className={cacheInfo.exists ? 'text-green-600' : 'text-gray-400'}>
-                          {cacheInfo.exists ? '已缓存' : '未缓存'}
+                          {cacheInfo.exists ? 'Cached' : 'Not cached'}
                         </span>
                       </div>
                       {cacheInfo.exists && (
                         <>
                           <div className="flex justify-between">
-                            <span>缓存时间:</span>
+                            <span>Cache Age:</span>
                             <span>{formatCacheAge(cacheInfo.age)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span>缓存大小:</span>
+                            <span>Cache Size:</span>
                             <span>{formatCacheSize(cacheInfo.size)}</span>
                           </div>
                         </>
                       )}
                       <div className="pt-2 mt-2 border-t border-gray-100 text-xs text-gray-500">
-                        缓存有效期: 30分钟<br />
-                        存储在浏览器本地存储中
+                        Cache Validity: 30 minutes<br />
+                        Stored in browser local storage
                       </div>
                     </div>
                   </div>
@@ -171,7 +171,7 @@ export default function Header({
             
             {lastUpdated && (
               <div className="text-xs text-gray-500">
-                缓存于 {formatRelativeTime(lastUpdated)}
+                Cached {formatRelativeTime(lastUpdated)}
               </div>
             )}
           </div>
