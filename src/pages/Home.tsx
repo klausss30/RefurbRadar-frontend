@@ -15,7 +15,7 @@ export default function Home() {
   const { countryCode, country, updateCountry, isDetecting, countries } = useCountry();
 
   // Load feed for selected country
-  const { products, loading, error, lastUpdated } = useFeed(countryCode, country);
+  const { products, loading, error, lastUpdated, refresh } = useFeed(countryCode, country);
 
   // Filter states
   const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
@@ -104,6 +104,8 @@ export default function Home() {
           onCountryChange={handleCountryChange}
           lastUpdated={null}
           isDetecting={isDetecting}
+          onRefresh={refresh}
+          isLoading={loading}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <LoadingState />
@@ -122,6 +124,8 @@ export default function Home() {
           onCountryChange={handleCountryChange}
           lastUpdated={null}
           isDetecting={false}
+          onRefresh={refresh}
+          isLoading={loading}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ErrorState 
@@ -151,6 +155,8 @@ export default function Home() {
         onCountryChange={handleCountryChange}
         lastUpdated={lastUpdated}
         isDetecting={false}
+        onRefresh={refresh}
+        isLoading={loading}
       />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

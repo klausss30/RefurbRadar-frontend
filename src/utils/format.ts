@@ -1,12 +1,43 @@
 /**
- * Formats price with currency symbol
+ * Formats price with currency symbol based on country locale
  */
-export function formatPrice(price: number, currency: string = "NZD"): string {
-  return new Intl.NumberFormat('en-NZ', {
+export function formatPrice(price: number, currency: string, locale?: string): string {
+  // If locale is provided, use it; otherwise try to infer from currency
+  const formatLocale = locale || getLocaleFromCurrency(currency);
+  
+  const formatted = new Intl.NumberFormat(formatLocale, {
     style: 'currency',
     currency: currency,
-    minimumFractionDigits: 2,
+    minimumFractionDigits: currency === 'JPY' || currency === 'KRW' ? 0 : 2,
+    maximumFractionDigits: currency === 'JPY' || currency === 'KRW' ? 0 : 2,
   }).format(price);
+  
+  // Replace apostrophe/quotation mark characters with space (for Swiss format: 2'039.00 -> 2 039.00)
+  // Support both ASCII apostrophe (U+0027) and Unicode right single quotation mark (U+2019)
+  return formatted.replace(/[\u0027\u2019]/g, ' ');
+}
+
+/**
+ * Get a reasonable locale from currency code
+ */
+function getLocaleFromCurrency(currency: string): string {
+  const currencyLocaleMap: Record<string, string> = {
+    USD: 'en-US',
+    EUR: 'de-DE', // Default to German format for EUR
+    GBP: 'en-GB',
+    JPY: 'ja-JP',
+    CNY: 'zh-CN',
+    AUD: 'en-AU',
+    CAD: 'en-CA',
+    NZD: 'en-NZ',
+    HKD: 'en-HK',
+    SGD: 'en-SG',
+    KRW: 'ko-KR',
+    CHF: 'de-CH',
+    TWD: 'zh-TW',
+    PLN: 'pl-PL',
+  };
+  return currencyLocaleMap[currency] || 'en-US';
 }
 
 /**
@@ -22,20 +53,44 @@ export function formatDate(dateString: string): string {
 }
 
 /**
- * Formats relative time (e.g., "2 days ago")
+ * Formats relative time (e.g., "2 minutes ago", "5 hours ago")
+ * Accepts both Date object and date string
  */
-export function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
+export function formatRelativeTime(date: Date | string): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffMs = now.getTime() - dateObj.getTime();
   
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-  return `${Math.floor(diffDays / 365)} years ago`;
+  // Handle negative time (future dates)
+  if (diffMs < 0) {
+    return '刚刚';
+  }
+  
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  
+  if (diffSeconds < 60) {
+    return '刚刚';
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes}分钟前`;
+  } else if (diffHours < 24) {
+    return `${diffHours}小时前`;
+  } else if (diffDays === 1) {
+    return '1天前';
+  } else if (diffDays < 7) {
+    return `${diffDays}天前`;
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    return `${weeks}周前`;
+  } else if (diffDays < 365) {
+    const months = Math.floor(diffDays / 30);
+    return `${months}个月前`;
+  } else {
+    const years = Math.floor(diffDays / 365);
+    return `${years}年前`;
+  }
 }
 
 /**

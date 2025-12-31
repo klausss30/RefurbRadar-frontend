@@ -12,22 +12,30 @@ import {
 } from "../utils/regex";
 import { detectCategory, cleanTitle } from "../utils/category";
 import { createHash } from "../utils/format";
+import { getCountryConfig, getCurrencyCode } from "../config/countries";
 
 /**
  * Normalizes an RSS item element to a Product object
  */
 export function normalizeProduct(
   item: Element,
-  country: Country = "nz"
+  countryCode: Country = "nz"
 ): Product {
   const data = extractItemData(item);
   const descriptionHtml = data.description;
   const specsText = htmlToPlainText(descriptionHtml);
 
+  // Get country-specific configuration
+  const countryConfig = getCountryConfig(countryCode);
+  const currency = (getCurrencyCode(countryCode) ||
+    "USD") as Product["currency"];
+  const pricePattern = countryConfig?.pricePattern || /\$([\d,]+(\.\d{2})?)/;
+
   // Extract basic fields
   // Price might be in title (format: "Product Name - SKU - $999.00") or in content
-  const priceFromTitle = extractPrice(data.title);
-  const priceFromContent = extractPrice(descriptionHtml);
+  // Use country-specific price pattern
+  const priceFromTitle = extractPrice(data.title, pricePattern);
+  const priceFromContent = extractPrice(descriptionHtml, pricePattern);
   const price = priceFromTitle || priceFromContent || 0;
 
   // Extract image URL (debug if needed)
@@ -67,12 +75,12 @@ export function normalizeProduct(
 
   return {
     id,
-    country,
+    country: countryCode,
     rawTitle: data.title,
     title,
     category,
     price,
-    currency: "NZD",
+    currency,
     publishedAt,
     link: data.link,
     imageUrl,

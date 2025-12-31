@@ -2,6 +2,7 @@ import type { Product } from "../types/product";
 import { formatPrice, formatRelativeTime } from "../utils/format";
 import { extractOverviewItems } from "../utils/html";
 import { useImageCache } from "../hooks/useImageCache";
+import { getLocale } from "../config/countries";
 
 interface ProductCardProps {
   product: Product;
@@ -75,13 +76,16 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-semibold text-gray-900 text-sm mb-3 leading-relaxed">
-          {product.title}
-        </h3>
+        {/* Title area with minimum height to align prices across cards */}
+        <div className="min-h-[4rem] mb-3 flex items-start">
+          <h3 className="font-semibold text-gray-900 text-sm leading-relaxed">
+            {product.title}
+          </h3>
+        </div>
 
         {/* Price */}
         <div className="text-2xl font-bold text-gray-900 mb-3">
-          {formatPrice(product.price, product.currency)}
+          {formatPrice(product.price, product.currency, getLocale(product.country))}
         </div>
 
         {/* Overview - Flexible content area */}

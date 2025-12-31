@@ -41,6 +41,23 @@ export type Category =
   | "Accessories"
   | "Other";
 
+// Supported currency codes
+export type Currency =
+  | "AUD"
+  | "EUR"
+  | "CAD"
+  | "CNY"
+  | "HKD"
+  | "JPY"
+  | "NZD"
+  | "PLN"
+  | "SGD"
+  | "KRW"
+  | "CHF"
+  | "TWD"
+  | "GBP"
+  | "USD";
+
 export interface Product {
   id: string; // stable hash: title + pubDate + link
   country: Country;
@@ -48,7 +65,7 @@ export interface Product {
   title: string; // cleaned display title
   category: Category;
   price: number;
-  currency: "NZD";
+  currency: Currency;
   publishedAt: string; // ISO string
   link: string; // Apple Store product link
   imageUrl?: string;
