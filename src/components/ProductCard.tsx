@@ -76,7 +76,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 min-h-[2.5rem]">
+        <h3 className="font-semibold text-gray-900 text-sm mb-2 leading-relaxed">
           {product.title}
         </h3>
 

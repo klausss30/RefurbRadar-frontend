@@ -83,11 +83,21 @@ export function detectCategory(title: string): Category {
 
 /**
  * Cleans product title for display
+ * Removes SKU, price, and refurbished suffixes
  */
 export function cleanTitle(title: string): string {
+  // Remove price pattern: - $1,179.00 or - $1,179.00 (at the end)
+  let cleaned = title.replace(/\s*-\s*\$[\d,]+(\.\d{2})?\s*$/i, "");
+
+  // Remove SKU pattern: - FCA64X/A or - FCA64X/A/ (format: letters/numbers + / + letter)
+  cleaned = cleaned.replace(/\s*-\s*[A-Z0-9]+\/[A-Z]+\s*/g, "");
+
   // Remove common suffixes and clean up
-  return title
+  cleaned = cleaned
     .replace(/\s*-\s*Refurbished.*$/i, "")
     .replace(/\s*\(Refurbished\).*$/i, "")
+    .replace(/\s*-\s*$/g, "") // Remove trailing dashes
     .trim();
+
+  return cleaned;
 }
