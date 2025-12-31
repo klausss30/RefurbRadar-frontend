@@ -17,15 +17,9 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
 
   // Filter states
   const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
-  const [selectedChip, setSelectedChip] = useState<string | null>(null);
-  const [selectedRAM, setSelectedRAM] = useState<number | null>(null);
-  const [selectedStorage, setSelectedStorage] = useState<number | null>(null);
-  const [selectedNetwork, setSelectedNetwork] = useState<'Wi-Fi' | 'Cellular' | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
 
@@ -41,14 +35,6 @@ export default function Home() {
         const normalized = normalizeProducts(items, 'NZ');
         
         setProducts(normalized);
-        
-        // Initialize price range
-        const prices = normalized.map(p => p.price).filter(p => p > 0);
-        if (prices.length > 0) {
-          const min = Math.min(...prices);
-          const max = Math.max(...prices);
-          setPriceRange([min, max]);
-        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load products');
       } finally {
@@ -72,33 +58,6 @@ export default function Home() {
     // Category filter
     if (selectedCategories.size > 0) {
       filtered = filtered.filter(p => selectedCategories.has(p.category));
-    }
-
-    // Price range filter
-    filtered = filtered.filter(p => {
-      if (priceRange[0] > 0 && p.price < priceRange[0]) return false;
-      if (priceRange[1] > 0 && p.price > priceRange[1]) return false;
-      return true;
-    });
-
-    // Chip filter
-    if (selectedChip) {
-      filtered = filtered.filter(p => p.chip === selectedChip);
-    }
-
-    // RAM filter
-    if (selectedRAM) {
-      filtered = filtered.filter(p => p.ramGB === selectedRAM);
-    }
-
-    // Storage filter
-    if (selectedStorage) {
-      filtered = filtered.filter(p => p.storageGB === selectedStorage);
-    }
-
-    // Network filter
-    if (selectedNetwork) {
-      filtered = filtered.filter(p => p.network === selectedNetwork);
     }
 
     // Search filter
@@ -129,11 +88,6 @@ export default function Home() {
   }, [
     products,
     selectedCategories,
-    priceRange,
-    selectedChip,
-    selectedRAM,
-    selectedStorage,
-    selectedNetwork,
     searchQuery,
     sortOption,
   ]);
@@ -182,19 +136,9 @@ export default function Home() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar */}
-          <aside className={`lg:w-64 lg:sticky lg:top-24 lg:h-fit ${showFilters ? 'block' : 'hidden lg:block'}`}>
+          {/* Filters Sidebar - Desktop only */}
+          <aside className="hidden lg:block lg:w-64 lg:sticky lg:top-24 lg:h-fit">
             <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-              <div className="flex items-center justify-between lg:hidden">
-                <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-
               <CategoryFilter
                 categories={availableCategories}
                 selectedCategories={selectedCategories}
@@ -203,21 +147,20 @@ export default function Home() {
 
               <div className="border-t border-gray-200 pt-6">
                 <SpecFilters
-                  products={products}
-                  priceRange={priceRange}
-                  onPriceRangeChange={setPriceRange}
-                  selectedChip={selectedChip}
-                  onChipChange={setSelectedChip}
-                  selectedRAM={selectedRAM}
-                  onRAMChange={setSelectedRAM}
-                  selectedStorage={selectedStorage}
-                  onStorageChange={setSelectedStorage}
-                  selectedNetwork={selectedNetwork}
-                  onNetworkChange={setSelectedNetwork}
                   searchQuery={searchQuery}
                   onSearchChange={setSearchQuery}
                 />
               </div>
+            </div>
+          </aside>
+
+          {/* Mobile Search - Show on mobile only */}
+          <aside className="lg:hidden mb-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <SpecFilters
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
             </div>
           </aside>
 
@@ -226,12 +169,6 @@ export default function Home() {
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowFilters(true)}
-                  className="lg:hidden px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                >
-                  Filters
-                </button>
                 <div className="text-sm text-gray-600">
                   {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
                 </div>
@@ -257,14 +194,6 @@ export default function Home() {
           </main>
         </div>
       </div>
-
-      {/* Mobile Filter Overlay */}
-      {showFilters && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setShowFilters(false)}
-        />
-      )}
     </div>
   );
 }

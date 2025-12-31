@@ -107,6 +107,9 @@ export function extractOverviewItems(specsText: string): string[] {
       if (line.match(/^\$[\d,]+/)) return false; // Price lines
       if (line.match(/Product page|View on|Apple Store/i)) return false; // Link text
       if (line.match(/^Refurbished\s/i)) return false; // Title repetition
+      // Filter out SKU lines (format: letters/numbers followed by / and letter, like "FC6A4X/A")
+      if (line.match(/^[A-Z0-9]+\/[A-Z]$/)) return false; // SKU only lines (e.g., "FC6A4X/A")
+      if (line.match(/^[–-]\s*[A-Z0-9]+\/[A-Z]$/)) return false; // SKU with dash prefix
       return true;
     });
   
