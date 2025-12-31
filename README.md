@@ -13,7 +13,11 @@ A radar-style Apple refurbished product browser built with React, TypeScript, an
 - ⚡ **Fast Client-Side Processing** - No backend needed
 - 📱 **Mobile-Friendly** - Optimized for all screen sizes
 - 🖼️ **Image Caching** - Smart image loading to reduce duplicate requests
-- 💾 **Local Storage** - Caches feed data and remembers country preference
+- 💾 **Product Data Caching** - Caches parsed product data with 30-minute expiration
+- 🔄 **Cache Refresh** - Manual cache refresh button to force data reload
+- 📊 **Cache Information** - View cache status, age, size, and storage location
+- ⏱️ **Relative Time Display** - Shows "X minutes ago" for last updated time
+- 🌐 **English Interface** - Fully localized English user interface
 
 ## Tech Stack
 
@@ -46,17 +50,46 @@ A radar-style Apple refurbished product browser built with React, TypeScript, an
    - Fetches feed from same-origin `/data/{code}_in_all.xml`
    - Avoids CORS by using local files
    - Parses and normalizes products
+   - Caches parsed product data in localStorage with 30-minute expiration
+   - Provides manual refresh function to bypass cache
+   - Returns cache metadata (age, size, timestamp) for display
 
 4. **Product Normalization** (`src/api/normalizeProduct.ts`)
 
    - Converts RSS items into structured `Product` objects
    - Extracts price, image, SKU, specs from HTML description
    - Detects category, chip, RAM, storage, network from text
+   - Cleans product titles (removes SKU, price, non-English refurbished prefixes)
+   - Preserves "Refurbished" prefix in English titles
+   - Filters out redundant information from product specifications
 
 5. **Frontend Processing** (`src/pages/Home.tsx`)
    - Loads products based on selected country
    - Applies filters and sorting in real-time using `useMemo`
    - Updates UI when country changes
+   - Provides refresh function to Header component for cache management
+
+6. **UI Components** (`src/components/Header.tsx`)
+   - Displays country selector and refresh button
+   - Shows relative time for last cache update
+   - Provides cache information popup with storage location, status, age, and size
+
+### Caching Strategy
+
+**Product Data Caching:**
+
+The app uses a two-tier caching strategy:
+
+1. **Feed Files (Build-time)**: RSS feeds are downloaded at build time to avoid CORS issues
+2. **Product Data (Runtime)**: Parsed product data is cached in `localStorage` for 30 minutes
+
+**Cache Management:**
+
+- **Automatic**: Cache is checked on page load; valid cache (< 30 minutes old) is used immediately
+- **Manual Refresh**: Users can click the "Refresh Cache" button to force a reload
+- **Cache Info**: Shows cache status, age, size, and storage location (localStorage)
+- **Country-Specific**: Each country has its own cache entry
+- **Storage Location**: All caches are stored in browser `localStorage`
 
 ### CORS Strategy
 
@@ -75,6 +108,7 @@ RefurbRadar uses a build-time feed fetching strategy instead of runtime fetching
 2. Feeds are saved to `public/data/{country_code}_in_all.xml`
 3. The app fetches from same-origin (`/data/{code}_in_all.xml`)
 4. No CORS issues since files are on the same domain
+5. Parsed products are cached in localStorage for 30 minutes per country
 
 ### IP Geolocation
 
@@ -166,9 +200,9 @@ src/
     parseFeed.ts         # Parse RSS/Atom XML
     normalizeProduct.ts  # Convert RSS items to Product objects
   components/            # React components
-    CategoryFilter.tsx
+    CategoryFilter.tsx   # Category filter buttons
     CountrySelect.tsx    # Country dropdown selector
-    Header.tsx           # App header with country selector
+    Header.tsx           # App header with country selector, refresh button, and cache info
     ProductCard.tsx      # Individual product card
     ProductGrid.tsx      # Grid of product cards
     SpecFilters.tsx      # Search and filter inputs
@@ -185,10 +219,10 @@ src/
     product.ts           # TypeScript type definitions
   utils/
     cache.ts             # Feed caching utilities
-    category.ts          # Category detection
-    format.ts            # Formatting helpers
-    html.ts              # HTML parsing utilities
-    regex.ts             # Regex extraction utilities
+    category.ts          # Category detection and title cleaning
+    format.ts            # Formatting helpers (price, date, relative time)
+    html.ts              # HTML parsing utilities and overview extraction
+    regex.ts             # Regex extraction utilities (price, SKU, specs)
 scripts/
   fetchFeeds.mjs        # Build-time feed downloader
 public/
@@ -311,6 +345,36 @@ RefurbRadar supports the following countries (25 total):
 24. United Kingdom (`uk`)
 25. United States (`us`)
 
+## Data Processing
+
+### Product Title Cleaning
+
+Product titles are cleaned to remove redundant information:
+
+- **SKU Removal**: Removes SKU patterns (e.g., `- FUWA3ZM/A`)
+- **Price Removal**: Removes price information from titles (handles multiple currency formats)
+- **Refurbished Prefixes**: Removes non-English refurbished prefixes (French, Dutch, etc.)
+- **Refurbished Preservation**: Keeps "Refurbished" prefix in English titles for clarity
+
+### Price Extraction
+
+The app extracts prices from multiple formats:
+
+- **US/UK Format**: `$1,299.00`, `£459.00`
+- **European Format**: `€ 79,00` or `79,00 €` (comma decimal, dot/space thousands)
+- **Asian Formats**: `¥295,800`, `₩4,964,000`, `HK$22,699.00`
+- **Swiss Formats**: `CHF 1'599.00` (apostrophe thousands) or `1 599.00 CHF` (space thousands)
+- **Currency-Specific Patterns**: Each country has its own price pattern regex for accurate extraction
+
+### Specification Filtering
+
+Product specifications are filtered to remove:
+
+- Product titles that appear in specifications
+- Price information that appears in specifications
+- Redundant "refurbished" indicators in various languages
+- Strikethrough prices and discount percentages
+
 ## Troubleshooting
 
 ### Feed file not found
@@ -318,6 +382,17 @@ RefurbRadar supports the following countries (25 total):
 **Error**: `Feed file not found for {country}. Please run "npm run fetch:feeds"`
 
 **Solution**: Run `npm run fetch:feeds` to download the feed files.
+
+### Cache not updating
+
+**Issue**: Changes to feeds not reflected after refresh
+
+**Solution**:
+
+- Click the "Refresh Cache" button to force a reload
+- Clear browser localStorage if needed: `localStorage.clear()` in browser console
+- Cache expires after 30 minutes automatically
+- Each country has its own cache entry
 
 ### IP geolocation not working
 

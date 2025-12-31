@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Category } from '../types/product';
 import { useCountry } from '../hooks/useCountry';
 import { useFeed } from '../hooks/useFeed';
@@ -6,9 +6,28 @@ import Header from '../components/Header';
 import CategoryFilter from '../components/CategoryFilter';
 import SpecFilters from '../components/SpecFilters';
 import ProductGrid from '../components/ProductGrid';
+import Pagination from '../components/Pagination';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 
 type SortOption = 'newest' | 'price-low' | 'price-high';
+
+// Category order based on user preference: Mac, iPad, iPhone, Watch, Apple TV, HomePod, Accessories
+const CATEGORY_ORDER: Category[] = [
+  'MacBook Air',
+  'MacBook Pro',
+  'iMac',
+  'Mac Mini',
+  'Mac Studio',
+  'Mac Pro',
+  'iPad',
+  'iPhone',
+  'Apple Watch',
+  'Apple TV',
+  'HomePod',
+  'Displays',
+  'Accessories',
+  'Other',
+];
 
 export default function Home() {
   // Country selection with IP geolocation
@@ -21,6 +40,10 @@ export default function Home() {
   const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Items per page
+  const ITEMS_PER_PAGE = 24;
 
   // Handle country change
   const handleCountryChange = (newCode: string) => {
@@ -28,12 +51,21 @@ export default function Home() {
     // Reset filters when country changes
     setSelectedCategories(new Set());
     setSearchQuery('');
+    setCurrentPage(1); // Reset to first page
   };
 
-  // Get unique categories from products
+  // Get unique categories from products and sort by custom order
   const availableCategories = useMemo(() => {
     const cats = new Set(products.map(p => p.category));
-    return Array.from(cats).sort();
+    return Array.from(cats).sort((a, b) => {
+      const indexA = CATEGORY_ORDER.indexOf(a);
+      const indexB = CATEGORY_ORDER.indexOf(b);
+      // If category not found in order, put it at the end
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
   }, [products]);
 
   // Filter and sort products
@@ -76,6 +108,23 @@ export default function Home() {
     searchQuery,
     sortOption,
   ]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategories, searchQuery, sortOption]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleCategoryToggle = (category: Category) => {
     setSelectedCategories(prev => {
@@ -212,7 +261,14 @@ export default function Home() {
             {filteredProducts.length === 0 ? (
               <EmptyState />
             ) : (
-              <ProductGrid products={filteredProducts} />
+              <>
+                <ProductGrid products={paginatedProducts} />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
             )}
           </main>
         </div>
