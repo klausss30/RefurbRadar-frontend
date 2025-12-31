@@ -2,10 +2,12 @@ import { getCachedFeed, setCachedFeed } from "../utils/cache";
 
 /**
  * Fetches RSS feed from the given URL with caching
- * Uses localStorage to cache feed data for 5 minutes to reduce API calls
- * Uses Vite proxy in development, falls back to CORS proxy in production if needed
+ * Uses localStorage to cache feed XML data for 5 minutes to reduce API calls
+ * 
+ * Development: Uses Vite proxy to bypass CORS
+ * Production: Uses CORS proxy (api.allorigins.win) to fetch data
  *
- * @param url The RSS feed URL
+ * @param url The RSS feed URL (e.g., https://refurb-tracker.com/feeds/nz_in_all.xml)
  * @param maxCacheAge Maximum cache age in milliseconds (default: 5 minutes)
  * @param forceRefresh If true, bypass cache and fetch fresh data
  * @returns The feed XML string
@@ -19,25 +21,29 @@ export async function fetchFeed(
   if (!forceRefresh) {
     const cached = getCachedFeed(url, maxCacheAge);
     if (cached) {
-      console.log("Using cached feed data");
       return cached;
     }
   }
 
-  // In development, use Vite proxy to bypass CORS
-  // In production, try direct fetch first, then fallback to CORS proxy
   const isDevelopment = import.meta.env.DEV;
-
-  let fetchUrl = url;
+  let fetchUrl: string;
 
   if (isDevelopment) {
-    // Use Vite proxy (configured in vite.config.ts)
-    fetchUrl = "/api/feed";
+    // In development, use Vite proxy to bypass CORS
+    // Extract path from URL: https://refurb-tracker.com/feeds/nz_in_all.xml -> /api/feeds/nz_in_all.xml
+    const urlObj = new URL(url);
+    fetchUrl = `/api${urlObj.pathname}`;
+  } else {
+    // In production, use CORS proxy directly (refurb-tracker.com doesn't allow CORS)
+    fetchUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
   }
 
   try {
-    console.log("Fetching fresh feed data...");
-    const response = await fetch(fetchUrl);
+    const response = await fetch(fetchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; RefurbRadar/1.0)',
+      },
+    });
 
     if (!response.ok) {
       throw new Error(
@@ -47,53 +53,30 @@ export async function fetchFeed(
 
     const data = await response.text();
 
+    // Validate that we got XML data
+    if (!data || data.trim().length === 0) {
+      throw new Error("Feed response is empty");
+    }
+
+    // Check if response is HTML error page instead of XML
+    const trimmed = data.trim();
+    if (trimmed.toLowerCase().startsWith('<!doctype') || trimmed.toLowerCase().startsWith('<html')) {
+      throw new Error("Received HTML error page instead of XML feed");
+    }
+
     // Cache the fetched data
     setCachedFeed(url, data);
 
     return data;
   } catch (error) {
-    // If direct fetch fails in production (CORS issue), try CORS proxy
-    if (
-      !isDevelopment &&
-      error instanceof TypeError &&
-      error.message.includes("fetch")
-    ) {
-      console.warn("Direct fetch failed, trying CORS proxy...");
-
-      // Use a public CORS proxy as fallback
-      // Note: This is a temporary solution. For production, consider setting up your own proxy.
-      const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(
-        url
-      )}`;
-      const proxyResponse = await fetch(corsProxyUrl);
-
-      if (!proxyResponse.ok) {
-        // If fetch fails, try to use stale cache if available
-        const staleCache = getCachedFeed(url, Infinity);
-        if (staleCache) {
-          console.warn("Network error, using stale cache data");
-          return staleCache;
-        }
-        throw new Error(
-          `Failed to fetch feed via proxy: ${proxyResponse.status} ${proxyResponse.statusText}`
-        );
-      }
-
-      const data = await proxyResponse.text();
-
-      // Cache the fetched data
-      setCachedFeed(url, data);
-
-      return data;
-    }
-
     // If fetch fails, try to use stale cache if available
     const staleCache = getCachedFeed(url, Infinity);
     if (staleCache) {
-      console.warn("Network error, using stale cache data");
+      console.warn("Network error, using stale cache data:", error);
       return staleCache;
     }
 
+    // Re-throw error if no cache available
     throw error;
   }
 }

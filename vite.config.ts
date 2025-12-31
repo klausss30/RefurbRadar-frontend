@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api/feed': {
+      '/api/feeds': {
         target: 'https://refurb-tracker.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/feed/, '/feeds/nz_in_all.xml'),
+        rewrite: (path) => path.replace(/^\/api\/feeds/, '/feeds'),
         secure: true,
       },
     },

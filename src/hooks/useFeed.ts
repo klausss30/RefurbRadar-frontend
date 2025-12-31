@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { parseFeed } from '../api/parseFeed';
 import { normalizeProducts } from '../api/normalizeProduct';
+import { fetchFeed } from '../api/fetchFeed';
 import type { Product } from '../types/product';
 import type { Country as CountryCode } from '../types/product';
 import type { Country as CountryConfig } from '../config/countries';
-import { getLocalFeedPath } from '../config/countries';
+import { getFeedUrl } from '../config/countries';
 
 const PRODUCTS_CACHE_PREFIX = 'refurbradar_products_';
 const PRODUCTS_CACHE_TIMESTAMP_PREFIX = 'refurbradar_products_timestamp_';
@@ -151,8 +152,9 @@ export function getProductsCacheInfo(countryCode: string): { exists: boolean; ag
 
 /**
  * Hook to load feed for a specific country
- * Fetches from same-origin /data/{code}_in_all.xml
+ * Fetches from remote RSS URL (https://refurb-tracker.com/feeds/{code}_in_all.xml)
  * Uses localStorage to cache parsed products for 30 minutes
+ * Feed XML data is also cached in localStorage for 5 minutes
  */
 export function useFeed(countryCode: string, country: CountryConfig) {
   const [products, setProducts] = useState<Product[]>([]);
@@ -180,45 +182,23 @@ export function useFeed(countryCode: string, country: CountryConfig) {
         if (refreshKey === 0) {
           const cached = getCachedProducts(countryCode);
           if (cached && cached.products.length > 0) {
-            console.log(`✅ Using cached products for ${countryCode} (${cached.products.length} products)`);
             if (!cancelled) {
               setProducts(cached.products);
               // Use the cache timestamp, not current time
               setLastUpdated(new Date(cached.timestamp));
               setLoading(false);
             }
-            return; // Exit early, don't fetch from file
-          } else {
-            console.log(`ℹ️ No valid cache found for ${countryCode}, fetching from file...`);
+            return; // Exit early, don't fetch from remote
           }
-        } else {
-          console.log(`🔄 Force refresh requested for ${countryCode}, bypassing cache...`);
         }
 
-        // Fetch from same-origin local file
-        const feedPath = getLocalFeedPath(countryCode);
-        const response = await fetch(feedPath);
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error(
-              `Feed file not found for ${country.label}. ` +
-              `Please run "npm run fetch:feeds" to download the feed.`
-            );
-          }
-          throw new Error(`Failed to load feed: ${response.status} ${response.statusText}`);
-        }
-
-        const xmlString = await response.text();
+        // Fetch from remote RSS URL
+        const feedUrl = getFeedUrl(countryCode);
+        const forceRefresh = refreshKey > 0; // Force refresh feed XML cache if user requested refresh
+        const xmlString = await fetchFeed(feedUrl, 5 * 60 * 1000, forceRefresh);
 
         if (!xmlString || xmlString.trim().length === 0) {
-          throw new Error('Feed file is empty');
-        }
-
-        // Check content type if available
-        const contentType = response.headers.get('content-type');
-        if (contentType && !contentType.includes('xml') && !contentType.includes('rss') && !contentType.includes('atom')) {
-          console.warn(`Unexpected content type: ${contentType}`);
+          throw new Error('Feed response is empty');
         }
 
         try {
@@ -240,21 +220,20 @@ export function useFeed(countryCode: string, country: CountryConfig) {
           // Provide more helpful error message
           const errorMsg = parseError instanceof Error ? parseError.message : 'Unknown parsing error';
           
-          // Check if file looks like it might be an error page
+          // Check if response looks like it might be an error page
           if (xmlString.trim().toLowerCase().includes('<html') || 
               xmlString.trim().toLowerCase().includes('<!doctype')) {
             throw new Error(
-              `Feed file appears to be an HTML error page, not XML. ` +
-              `This might mean the feed file doesn't exist or wasn't downloaded correctly. ` +
-              `Please run "npm run fetch:feeds" to download feeds. ` +
+              `Feed response appears to be an HTML error page, not XML. ` +
+              `This might mean the feed URL doesn't exist or the server returned an error. ` +
+              `Please try again later or check if the feed URL is correct. ` +
               `Original error: ${errorMsg}`
             );
           }
           
           throw new Error(
             `Failed to parse feed XML for ${country.label}. ` +
-            `The file might be corrupted or in an unexpected format. ` +
-            `Try running "npm run fetch:feeds" to re-download feeds. ` +
+            `The feed might be corrupted or in an unexpected format. ` +
             `Error: ${errorMsg}`
           );
         }

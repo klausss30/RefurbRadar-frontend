@@ -181,16 +181,6 @@ export default function Home() {
             message={error} 
             onRetry={handleRetry}
           />
-          {error.includes('not found') && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                <strong>Feed file missing:</strong> The feed for {country.label} hasn't been downloaded yet.
-              </p>
-              <p className="text-sm text-yellow-700 mt-2">
-                Please run <code className="bg-yellow-100 px-1 py-0.5 rounded">npm run fetch:feeds</code> to download the feed.
-              </p>
-            </div>
-          )}
         </div>
       </div>
     );
