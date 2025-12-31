@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import type { Category } from '../types/product';
 
 interface CategoryFilterProps {
   categories: Category[];
   selectedCategories: Set<Category>;
   onToggle: (category: Category) => void;
+  collapsible?: boolean; // Whether to make it collapsible on mobile
+  defaultCollapsed?: boolean; // Default collapsed state
 }
 
 const CATEGORY_LABELS: Record<Category, string> = {
@@ -27,11 +30,58 @@ export default function CategoryFilter({
   categories,
   selectedCategories,
   onToggle,
+  collapsible = false,
+  defaultCollapsed = true,
 }: CategoryFilterProps) {
+  const [isCollapsed, setIsCollapsed] = useState(collapsible && defaultCollapsed);
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  const selectedCount = selectedCategories.size;
+
   return (
     <div>
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">Category</h3>
-      <div className="space-y-2">
+      {collapsible ? (
+        <button
+          onClick={toggleCollapse}
+          className="flex items-center justify-between w-full text-sm font-semibold text-gray-900 mb-3 hover:text-gray-700 focus:outline-none"
+          aria-expanded={!isCollapsed}
+        >
+          <span>
+            Category
+            {selectedCount > 0 && (
+              <span className="ml-2 text-xs font-normal text-blue-600">
+                ({selectedCount})
+              </span>
+            )}
+          </span>
+          <svg
+            className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+              isCollapsed ? '' : 'transform rotate-180'
+            }`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+      ) : (
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">Category</h3>
+      )}
+      
+      <div
+        className={`space-y-2 transition-all duration-200 ease-in-out ${
+          collapsible && isCollapsed ? 'hidden' : 'block'
+        }`}
+      >
         {categories.map((category) => (
           <label
             key={category}

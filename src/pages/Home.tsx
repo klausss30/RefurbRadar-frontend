@@ -218,8 +218,20 @@ export default function Home() {
             </div>
           </aside>
 
-          {/* Mobile Search - Show on mobile only */}
-          <aside className="lg:hidden mb-4">
+          {/* Mobile Filters - Show on mobile only */}
+          <aside className="lg:hidden mb-4 space-y-4">
+            {/* Category Filter */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <CategoryFilter
+                categories={availableCategories}
+                selectedCategories={selectedCategories}
+                onToggle={handleCategoryToggle}
+                collapsible={true}
+                defaultCollapsed={true}
+              />
+            </div>
+            
+            {/* Search Filter */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <SpecFilters
                 searchQuery={searchQuery}
