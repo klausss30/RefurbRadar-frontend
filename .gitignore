@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Generated feed files (downloaded via npm run fetch:feeds)
+public/data/*.xml

@@ -18,7 +18,7 @@ import { createHash } from "../utils/format";
  */
 export function normalizeProduct(
   item: Element,
-  country: Country = "NZ"
+  country: Country = "nz"
 ): Product {
   const data = extractItemData(item);
   const descriptionHtml = data.description;
@@ -92,7 +92,7 @@ export function normalizeProduct(
  */
 export function normalizeProducts(
   items: Element[],
-  country: Country = "NZ"
+  country: Country = "nz"
 ): Product[] {
   return items.map((item) => normalizeProduct(item, country));
 }

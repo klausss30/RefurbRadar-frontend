@@ -3,13 +3,65 @@
  * Supports both Atom feed format and RSS 2.0 format
  */
 export function parseFeed(xmlString: string): Element[] {
+  // Validate input
+  if (!xmlString || xmlString.trim().length === 0) {
+    throw new Error("Feed XML is empty");
+  }
+
+  // Check if it looks like HTML (common error when feed URL returns HTML error page)
+  const trimmed = xmlString.trim();
+  if (
+    trimmed.toLowerCase().startsWith("<!doctype") ||
+    trimmed.toLowerCase().startsWith("<html") ||
+    trimmed.toLowerCase().startsWith("<!")
+  ) {
+    // Try to extract error message from HTML
+    const htmlMatch =
+      trimmed.match(/<title[^>]*>(.*?)<\/title>/i) ||
+      trimmed.match(/<h1[^>]*>(.*?)<\/h1>/i);
+    const errorMsg = htmlMatch ? htmlMatch[1] : "Received HTML instead of XML";
+    throw new Error(
+      `Feed appears to be HTML (error page) instead of XML. ${errorMsg}`
+    );
+  }
+
+  // Remove BOM if present
+  const cleaned = trimmed.replace(/^\uFEFF/, "");
+
   const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+  const xmlDoc = parser.parseFromString(cleaned, "text/xml");
 
   // Check for parsing errors
   const parserError = xmlDoc.querySelector("parsererror");
   if (parserError) {
-    throw new Error("Failed to parse feed: " + parserError.textContent);
+    const errorText = parserError.textContent || "Unknown XML parsing error";
+
+    // Try to get more details about the error
+    const lineMatch = errorText.match(/line (\d+)/i);
+
+    let errorMessage = `Failed to parse feed XML: ${errorText}`;
+
+    if (lineMatch) {
+      const lineNum = parseInt(lineMatch[1], 10);
+      const lines = cleaned.split("\n");
+      if (lineNum > 0 && lineNum <= lines.length) {
+        const problemLine = lines[lineNum - 1];
+        errorMessage += `\n\nProblem at line ${lineNum}: ${problemLine.substring(
+          0,
+          100
+        )}`;
+      }
+    }
+
+    // Show first 500 chars for debugging
+    if (cleaned.length > 0) {
+      errorMessage += `\n\nFirst 500 characters of received data:\n${cleaned.substring(
+        0,
+        500
+      )}`;
+    }
+
+    throw new Error(errorMessage);
   }
 
   // Try Atom format first (entry elements), then RSS 2.0 (item elements)

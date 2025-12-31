@@ -1,4 +1,29 @@
-export type Country = "NZ";
+export type Country =
+  | "au"
+  | "bx"
+  | "be"
+  | "ca"
+  | "xf"
+  | "cn"
+  | "de"
+  | "es"
+  | "fr"
+  | "hk"
+  | "hz"
+  | "ie"
+  | "it"
+  | "jp"
+  | "nl"
+  | "nz"
+  | "at"
+  | "pl"
+  | "sg"
+  | "kr"
+  | "cx"
+  | "ch"
+  | "tw"
+  | "uk"
+  | "us";
 
 export type Category =
   | "iPad"
@@ -39,4 +64,3 @@ export interface Product {
 
   specsText?: string; // plain text specs summary
 }
-

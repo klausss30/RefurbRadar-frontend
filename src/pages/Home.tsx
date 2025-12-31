@@ -1,9 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
-import type { Product, Category } from '../types/product';
-import { fetchFeed } from '../api/fetchFeed';
-import { parseFeed } from '../api/parseFeed';
-import { normalizeProducts } from '../api/normalizeProduct';
-import { getCacheAge, formatCacheAge, isCacheFresh } from '../utils/cache';
+import { useState, useMemo } from 'react';
+import type { Category } from '../types/product';
+import { useCountry } from '../hooks/useCountry';
+import { useFeed } from '../hooks/useFeed';
 import Header from '../components/Header';
 import CategoryFilter from '../components/CategoryFilter';
 import SpecFilters from '../components/SpecFilters';
@@ -12,82 +10,25 @@ import { LoadingState, ErrorState, EmptyState } from '../components/States';
 
 type SortOption = 'newest' | 'price-low' | 'price-high';
 
-const FEED_URL = 'https://refurb-tracker.com/feeds/nz_in_all.xml';
-
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
+  // Country selection with IP geolocation
+  const { countryCode, country, updateCountry, isDetecting, countries } = useCountry();
+
+  // Load feed for selected country
+  const { products, loading, error, lastUpdated } = useFeed(countryCode, country);
 
   // Filter states
   const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
 
-  // Load products function (reusable for initial load and refresh)
-  const loadProducts = async (forceRefresh: boolean = false) => {
-    try {
-      if (forceRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-      setError(null);
-      
-      const xmlString = await fetchFeed(FEED_URL, 5 * 60 * 1000, forceRefresh);
-      const items = parseFeed(xmlString);
-      const normalized = normalizeProducts(items, 'NZ');
-      
-      setProducts(normalized);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load products');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+  // Handle country change
+  const handleCountryChange = (newCode: string) => {
+    updateCountry(newCode);
+    // Reset filters when country changes
+    setSelectedCategories(new Set());
+    setSearchQuery('');
   };
-
-  // Load products on mount
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  // Background refresh: check if cache is about to expire (within 1 minute)
-  useEffect(() => {
-    if (loading || refreshing) return;
-    
-    const checkCacheAndRefresh = () => {
-      // Skip if already loading or refreshing
-      if (loading || refreshing) return;
-      
-      const cacheAge = getCacheAge(FEED_URL);
-      const maxAge = 5 * 60 * 1000; // 5 minutes
-      
-      // If cache doesn't exist or is expired, refresh in background
-      if (cacheAge === null || !isCacheFresh(FEED_URL, maxAge)) {
-        // Cache expired, refresh
-        console.log('Cache expired, background refreshing feed data...');
-        loadProducts(false).catch(console.error);
-        return;
-      }
-      
-      // If cache is about to expire (less than 1 minute remaining), refresh in background
-      const remainingTime = maxAge - cacheAge;
-      if (remainingTime < 60 * 1000 && remainingTime > 0) {
-        console.log('Cache about to expire, background refreshing feed data...');
-        loadProducts(false).catch(console.error);
-      }
-    };
-
-    // Check every minute (60 seconds)
-    const interval = setInterval(checkCacheAndRefresh, 60 * 1000);
-    
-    // Also check immediately
-    checkCacheAndRefresh();
-    
-    return () => clearInterval(interval);
-  }, [loading, refreshing]);
 
   // Get unique categories from products
   const availableCategories = useMemo(() => {
@@ -149,13 +90,21 @@ export default function Home() {
   };
 
   const handleRetry = () => {
-    window.location.reload();
+    // Reload by triggering a country change to the same country
+    updateCountry(countryCode);
   };
 
-  if (loading) {
+  // Show loading during initial country detection or feed loading
+  if (loading || isDetecting) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <Header
+          countries={countries}
+          selectedCountry={country}
+          onCountryChange={handleCountryChange}
+          lastUpdated={null}
+          isDetecting={isDetecting}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <LoadingState />
         </div>
@@ -163,12 +112,32 @@ export default function Home() {
     );
   }
 
+  // Show error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <Header
+          countries={countries}
+          selectedCountry={country}
+          onCountryChange={handleCountryChange}
+          lastUpdated={null}
+          isDetecting={false}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <ErrorState message={error} onRetry={handleRetry} />
+          <ErrorState 
+            message={error} 
+            onRetry={handleRetry}
+          />
+          {error.includes('not found') && (
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>Feed file missing:</strong> The feed for {country.label} hasn't been downloaded yet.
+              </p>
+              <p className="text-sm text-yellow-700 mt-2">
+                Please run <code className="bg-yellow-100 px-1 py-0.5 rounded">npm run fetch:feeds</code> to download the feed.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -176,7 +145,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header
+        countries={countries}
+        selectedCountry={country}
+        onCountryChange={handleCountryChange}
+        lastUpdated={lastUpdated}
+        isDetecting={false}
+      />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
@@ -212,50 +187,8 @@ export default function Home() {
           <main className="flex-1">
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="text-sm text-gray-600">
-                  {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
-                </div>
-                
-                {/* Cache status and refresh button */}
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  {(() => {
-                    const cacheAge = getCacheAge(FEED_URL);
-                    const isFresh = isCacheFresh(FEED_URL, 5 * 60 * 1000);
-                    
-                    if (cacheAge !== null && isFresh) {
-                      return (
-                        <span className="flex items-center gap-1">
-                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                          Updated {formatCacheAge(cacheAge)}
-                        </span>
-                      );
-                    }
-                    return null;
-                  })()}
-                  
-                  <button
-                    onClick={() => loadProducts(true)}
-                    disabled={refreshing}
-                    className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                    title="Refresh data from RSS feed"
-                  >
-                    <svg
-                      className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                      />
-                    </svg>
-                    {refreshing ? 'Refreshing...' : 'Refresh'}
-                  </button>
-                </div>
+              <div className="text-sm text-gray-600">
+                {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
               </div>
 
               <select
@@ -281,4 +214,3 @@ export default function Home() {
     </div>
   );
 }
-

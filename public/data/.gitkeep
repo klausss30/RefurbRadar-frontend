@@ -1,0 +1,4 @@
+# This directory contains downloaded RSS feeds
+# Run "npm run fetch:feeds" to download feeds
+# Files are excluded from git (see .gitignore)
+
