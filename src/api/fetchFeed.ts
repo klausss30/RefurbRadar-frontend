@@ -35,15 +35,24 @@ export async function fetchFeed(
     fetchUrl = `/api${urlObj.pathname}`;
   } else {
     // In production, use CORS proxy directly (refurb-tracker.com doesn't allow CORS)
+    // Try multiple CORS proxies for better compatibility (especially Safari)
     fetchUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
   }
 
+  // Try to fetch with primary method
   try {
+    // Create timeout abort controller for better error handling (Safari compatible)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
     const response = await fetch(fetchUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; RefurbRadar/1.0)',
       },
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(
@@ -69,7 +78,41 @@ export async function fetchFeed(
 
     return data;
   } catch (error) {
-    // If fetch fails, try to use stale cache if available
+    // In production, if primary CORS proxy fails, try backup proxy
+    if (!isDevelopment && error instanceof Error) {
+      const backupProxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+      
+      try {
+        const backupController = new AbortController();
+        const backupTimeoutId = setTimeout(() => backupController.abort(), 30000);
+
+        const backupResponse = await fetch(backupProxyUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; RefurbRadar/1.0)',
+          },
+          signal: backupController.signal,
+        });
+
+        clearTimeout(backupTimeoutId);
+
+        if (backupResponse.ok) {
+          const data = await backupResponse.text();
+          
+          if (data && data.trim().length > 0) {
+            const trimmed = data.trim();
+            if (!trimmed.toLowerCase().startsWith('<!doctype') && !trimmed.toLowerCase().startsWith('<html')) {
+              // Valid XML data from backup proxy
+              setCachedFeed(url, data);
+              return data;
+            }
+          }
+        }
+      } catch (backupError) {
+        // Backup proxy also failed, continue to stale cache check
+      }
+    }
+
+    // If all fetch methods fail, try to use stale cache if available
     const staleCache = getCachedFeed(url, Infinity);
     if (staleCache) {
       console.warn("Network error, using stale cache data:", error);
