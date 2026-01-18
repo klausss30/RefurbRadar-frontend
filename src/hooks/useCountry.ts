@@ -94,56 +94,76 @@ export function useCountry() {
 }
 
 /**
- * Detect country from IP using a free geolocation API
- * Tries ipapi.co first, falls back to ipinfo.io
+ * Detect country from IP using server-side API
+ * Fetches IP geolocation through the proxy server
  */
 async function detectCountryFromIP(): Promise<string | null> {
-  // Try ipapi.co first (no key required)
+  // Get server proxy base URL from environment variable
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+  if (!apiBaseUrl) {
+    console.warn('VITE_API_BASE_URL is not configured. Cannot detect country from IP.');
+    return null;
+  }
+
+  // Remove trailing slash from base URL if present
+  const baseUrl = apiBaseUrl.replace(/\/$/, '');
+  
   try {
-    const response = await fetch('https://ipapi.co/json/', {
-      signal: AbortSignal.timeout(5000), // 5 second timeout
+    // Request IP geolocation from server
+    // Server endpoint: GET /api/ip/country
+    // Server should return the country code based on the client's IP address
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+    const response = await fetch(`${baseUrl}/api/ip/country`, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; RefurbRadar/1.0)',
+      },
     });
-    
+
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    // Server should return: { countryCode: 'nz' } or { country_code: 'NZ' } or { isoCode: 'NZ' }
+    // Try different possible response formats
+    let feedCode: string | null = null;
+    
+    // First, try if server returns feed code directly (e.g., 'nz', 'us', 'cn')
+    if (data.countryCode && typeof data.countryCode === 'string') {
+      const country = COUNTRIES.find(c => c.code === data.countryCode.toLowerCase());
+      if (country) {
+        return data.countryCode.toLowerCase();
+      }
     }
     
-    const data = await response.json();
-    const isoCode = data.country_code;
+    // Try ISO code formats (e.g., 'NZ', 'US', 'CN')
+    const isoCode = data.country_code || data.isoCode || data.country;
     
     if (isoCode && typeof isoCode === 'string') {
-      const feedCode = mapIsoToFeedCode(isoCode);
+      // Convert to uppercase if needed and map to feed code
+      const upperCode = isoCode.toUpperCase();
+      feedCode = mapIsoToFeedCode(upperCode);
       if (feedCode) {
         return feedCode;
       }
     }
-  } catch (error) {
-    console.warn('ipapi.co failed, trying ipinfo.io...', error);
-  }
 
-  // Fallback to ipinfo.io
-  try {
-    const response = await fetch('https://ipinfo.io/json', {
-      signal: AbortSignal.timeout(5000),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    
-    const data = await response.json();
-    const isoCode = data.country;
-    
-    if (isoCode && typeof isoCode === 'string') {
-      const feedCode = mapIsoToFeedCode(isoCode);
-      if (feedCode) {
-        return feedCode;
-      }
-    }
+    console.warn('Server returned invalid or unsupported country code format:', data);
+    return null;
   } catch (error) {
-    console.warn('ipinfo.io also failed:', error);
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('IP detection request timeout');
+    } else {
+      console.warn('Failed to detect country from IP via server:', error);
+    }
+    return null;
   }
-
-  return null;
 }
 

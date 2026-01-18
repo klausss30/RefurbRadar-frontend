@@ -64,6 +64,7 @@ A radar-style Apple refurbished product browser built with React, TypeScript, an
    - Filters out redundant information from product specifications
 
 5. **Frontend Processing** (`src/pages/Home.tsx`)
+
    - Loads products based on selected country
    - Applies filters and sorting in real-time using `useMemo`
    - Updates UI when country changes

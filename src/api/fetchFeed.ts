@@ -1,22 +1,11 @@
 import { getCachedFeed, setCachedFeed } from "../utils/cache";
 
 /**
- * List of CORS proxy services to try (in order of preference)
- * These proxies may not be available in all regions (e.g., China)
+ * Attempts to fetch data from the server proxy
  */
-const CORS_PROXIES = [
-  (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  (url: string) => `https://cors-anywhere.herokuapp.com/${url}`, // Note: This may require request activation
-  (url: string) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-];
-
-/**
- * Attempts to fetch data using a proxy URL
- */
-async function fetchWithProxy(
+async function fetchFromServer(
   proxyUrl: string,
-  timeout: number = 20000
+  timeout: number = 30000
 ): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -24,7 +13,7 @@ async function fetchWithProxy(
   try {
     const response = await fetch(proxyUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; RefurbRadar/1.0)',
+        "User-Agent": "Mozilla/5.0 (compatible; RefurbRadar/1.0)",
       },
       signal: controller.signal,
     });
@@ -43,7 +32,10 @@ async function fetchWithProxy(
 
     // Check if response is HTML error page instead of XML
     const trimmed = data.trim();
-    if (trimmed.toLowerCase().startsWith('<!doctype') || trimmed.toLowerCase().startsWith('<html')) {
+    if (
+      trimmed.toLowerCase().startsWith("<!doctype") ||
+      trimmed.toLowerCase().startsWith("<html")
+    ) {
       throw new Error("Received HTML error page instead of XML feed");
     }
 
@@ -55,11 +47,9 @@ async function fetchWithProxy(
 }
 
 /**
- * Fetches RSS feed from the given URL with caching
+ * Fetches RSS feed from the server proxy with caching
  * Uses localStorage to cache feed XML data for 5 minutes to reduce API calls
- * 
- * Development: Uses Vite proxy to bypass CORS
- * Production: Tries multiple CORS proxies in sequence
+ * All requests (development and production) go through the server-side proxy
  *
  * @param url The RSS feed URL (e.g., https://refurb-tracker.com/feeds/nz_in_all.xml)
  * @param maxCacheAge Maximum cache age in milliseconds (default: 5 minutes)
@@ -79,52 +69,55 @@ export async function fetchFeed(
     }
   }
 
-  const isDevelopment = import.meta.env.DEV;
-  const errors: Error[] = [];
+  // Get server proxy base URL from environment variable
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-  if (isDevelopment) {
-    // In development, use Vite proxy to bypass CORS
-    const urlObj = new URL(url);
-    const fetchUrl = `/api${urlObj.pathname}`;
-    
-    try {
-      const data = await fetchWithProxy(fetchUrl);
-      setCachedFeed(url, data);
-      return data;
-    } catch (error) {
-      errors.push(error instanceof Error ? error : new Error(String(error)));
+  if (!apiBaseUrl) {
+    const staleCache = getCachedFeed(url, Infinity);
+    if (staleCache) {
+      console.warn(
+        "VITE_API_BASE_URL is not configured. Using stale cache data."
+      );
+      return staleCache;
     }
-  } else {
-    // In production, try multiple CORS proxies in sequence
-    for (const proxyFn of CORS_PROXIES) {
-      try {
-        const proxyUrl = proxyFn(url);
-        const data = await fetchWithProxy(proxyUrl, 20000); // 20 second timeout per proxy
-        setCachedFeed(url, data);
-        return data;
-      } catch (error) {
-        errors.push(error instanceof Error ? error : new Error(String(error)));
-        // Continue to next proxy
-      }
-    }
+    throw new Error(
+      "Server proxy is not configured. Please set VITE_API_BASE_URL environment variable in .env file."
+    );
   }
 
-  // If all proxies fail, try to use stale cache if available
-  const staleCache = getCachedFeed(url, Infinity);
-  if (staleCache) {
-    console.warn("All proxies failed, using stale cache data. Errors:", errors);
-    return staleCache;
-  }
+  // Extract country code from URL: https://refurb-tracker.com/feeds/nz_in_all.xml -> nz
+  const urlObj = new URL(url);
+  const pathParts = urlObj.pathname.split("/");
+  const filename = pathParts[pathParts.length - 1]; // e.g., "nz_in_all.xml"
+  const countryCode = filename.replace("_in_all.xml", ""); // e.g., "nz"
 
-  // All methods failed and no cache available
-  const errorMessage = errors.length > 0 
-    ? errors.map(e => e.message).join('; ')
-    : 'Unknown error';
-  
-  throw new Error(
-    `Unable to fetch feed data. All proxy services failed. ` +
-    `This may be due to network restrictions in your region. ` +
-    `If you are in China, you may need to use a VPN or configure a server-side proxy. ` +
-    `Errors: ${errorMessage}`
-  );
+  // Remove trailing slash from base URL if present
+  const baseUrl = apiBaseUrl.replace(/\/$/, "");
+  const fetchUrl = `${baseUrl}/api/feeds/${countryCode}`;
+
+  try {
+    const data = await fetchFromServer(fetchUrl, 30000); // 30 second timeout
+    setCachedFeed(url, data);
+    return data;
+  } catch (error) {
+    // If fetch fails, try to use stale cache if available
+    const staleCache = getCachedFeed(url, Infinity);
+    if (staleCache) {
+      console.warn(
+        "Failed to fetch from server proxy, using stale cache data. Error:",
+        error
+      );
+      return staleCache;
+    }
+
+    // All methods failed and no cache available
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
+
+    throw new Error(
+      `Unable to fetch feed data from server proxy. ` +
+        `Please ensure your proxy server is running and accessible at ${baseUrl}. ` +
+        `Error: ${errorMessage}`
+    );
+  }
 }
