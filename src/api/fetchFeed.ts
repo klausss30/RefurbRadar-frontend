@@ -11,11 +11,20 @@ async function fetchFromServer(
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
+    // Safari compatibility: Use 'cors' mode explicitly and don't set User-Agent header
+    // (User-Agent is a forbidden header in browser fetch requests)
+    // Also use 'no-cors' is not suitable here as we need to read the response
     const response = await fetch(proxyUrl, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'omit', // Safari: don't send cookies
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; RefurbRadar/1.0)",
+        'Accept': 'application/xml, text/xml, application/rss+xml, */*',
       },
       signal: controller.signal,
+      // Safari: Ensure redirects are handled correctly
+      redirect: 'follow',
     });
 
     clearTimeout(timeoutId);
@@ -42,6 +51,16 @@ async function fetchFromServer(
     return data;
   } catch (error) {
     clearTimeout(timeoutId);
+    
+    // Safari-specific error handling
+    // Safari may throw different error messages than Chrome
+    if (error instanceof TypeError) {
+      // Network errors in Safari often show as TypeError
+      if (error.message.includes('fetch') || error.message.includes('network') || error.message.includes('Load failed')) {
+        throw new Error('Failed to fetch: Network error. Please check your internet connection.');
+      }
+    }
+    
     throw error;
   }
 }
@@ -111,13 +130,25 @@ export async function fetchFeed(
     }
 
     // All methods failed and no cache available
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    // Create user-friendly error message without exposing server URL
+    let errorMessage = "Unable to fetch product data from server.";
+    
+    if (error instanceof Error) {
+      // Map common errors to user-friendly messages
+      if (error.name === 'AbortError' || error.message.includes('timeout')) {
+        errorMessage = "Request timed out. Please check your internet connection and try again.";
+      } else if (error.message.includes('Failed to fetch') || error.message.includes('Load failed')) {
+        errorMessage = "Unable to connect to server. Please check your internet connection and try again.";
+      } else if (error.message.includes('HTTP 4')) {
+        errorMessage = "The requested data could not be found. Please try again later.";
+      } else if (error.message.includes('HTTP 5')) {
+        errorMessage = "Server error occurred. Please try again later.";
+      } else {
+        // Use generic error without technical details
+        errorMessage = "Unable to load products. Please try again later.";
+      }
+    }
 
-    throw new Error(
-      `Unable to fetch feed data from server proxy. ` +
-        `Please ensure your proxy server is running and accessible at ${baseUrl}. ` +
-        `Error: ${errorMessage}`
-    );
+    throw new Error(errorMessage);
   }
 }

@@ -116,11 +116,18 @@ async function detectCountryFromIP(): Promise<string | null> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
+    // Safari compatibility: Use 'cors' mode explicitly and don't set User-Agent header
+    // (User-Agent is a forbidden header in browser fetch requests)
     const response = await fetch(`${baseUrl}/api/ip/country`, {
-      signal: controller.signal,
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'omit', // Safari: don't send cookies
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; RefurbRadar/1.0)',
+        'Accept': 'application/json',
       },
+      signal: controller.signal,
+      redirect: 'follow',
     });
 
     clearTimeout(timeoutId);
