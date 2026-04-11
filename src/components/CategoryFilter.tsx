@@ -45,21 +45,24 @@ export default function CategoryFilter({
     <div>
       {collapsible ? (
         <button
+          type="button"
           onClick={toggleCollapse}
-          className="flex items-center justify-between w-full text-sm font-semibold text-gray-900 mb-3 hover:text-gray-700 focus:outline-none"
+          className="mb-4 flex w-full items-center justify-between rounded-2xl border border-white/60 bg-white/70 px-4 py-3 text-left text-sm font-semibold text-slate-900 shadow-[0_12px_24px_rgba(15,23,42,0.05)] transition hover:border-teal-200 hover:text-slate-700 focus:outline-none"
           aria-expanded={!isCollapsed}
         >
-          <span>
-            Category
+          <span className="flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
+              Category
+            </span>
             {selectedCount > 0 && (
-              <span className="ml-2 text-xs font-normal text-blue-600">
-                ({selectedCount})
+              <span className="rounded-full bg-teal-100 px-2.5 py-1 text-[11px] font-bold text-teal-700">
+                {selectedCount} selected
               </span>
             )}
           </span>
           <svg
-            className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-              isCollapsed ? '' : 'transform rotate-180'
+            className={`h-5 w-5 text-slate-500 transition-transform duration-200 ${
+              isCollapsed ? '' : 'rotate-180'
             }`}
             fill="none"
             viewBox="0 0 24 24"
@@ -74,32 +77,39 @@ export default function CategoryFilter({
           </svg>
         </button>
       ) : (
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Category</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
+            Category
+          </h3>
+          {selectedCount > 0 && (
+            <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white">
+              {selectedCount}
+            </span>
+          )}
+        </div>
       )}
-      
+
       <div
-        className={`space-y-2 transition-all duration-200 ease-in-out ${
-          collapsible && isCollapsed ? 'hidden' : 'block'
+        className={`flex-wrap gap-2 transition-all duration-200 ease-in-out ${
+          collapsible && isCollapsed ? 'hidden' : 'flex'
         }`}
       >
         {categories.map((category) => (
-          <label
+          <button
             key={category}
-            className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded"
+            type="button"
+            onClick={() => onToggle(category)}
+            aria-pressed={selectedCategories.has(category)}
+            className={`rounded-full border px-3 py-2 text-sm font-semibold transition duration-200 ${
+              selectedCategories.has(category)
+                ? 'border-teal-500 bg-teal-500 text-white shadow-[0_12px_24px_rgba(13,148,136,0.22)]'
+                : 'border-slate-200 bg-white/80 text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700'
+            }`}
           >
-            <input
-              type="checkbox"
-              checked={selectedCategories.has(category)}
-              onChange={() => onToggle(category)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <span className="ml-2 text-sm text-gray-700">
-              {CATEGORY_LABELS[category]}
-            </span>
-          </label>
+            {CATEGORY_LABELS[category]}
+          </button>
         ))}
       </div>
     </div>
   );
 }
-

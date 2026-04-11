@@ -11,6 +11,7 @@ export function detectCategory(title: string): Category {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // Remove accents
     .replace(/[\u00A0\u2000-\u200B\u202F\u205F\u3000]/g, " ") // Replace various Unicode spaces with regular space
+    .replace(/[-_/]+/g, " ") // Normalize common separators so "Mac-mini" still matches
     .replace(/\s+/g, " ") // Normalize multiple spaces to single space
     .toLowerCase();
 

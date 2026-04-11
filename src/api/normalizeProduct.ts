@@ -48,9 +48,9 @@ export function normalizeProduct(
   }
   const sku = extractSKU(data.title) || extractSKU(descriptionHtml);
 
-  // Detect category
-  const category = detectCategory(data.title);
   const title = cleanTitle(data.title);
+  const categorySource = [data.title, title, specsText].filter(Boolean).join(" ");
+  const category = detectCategory(categorySource);
 
   // Parse specs from description
   const chip = detectChip(specsText);

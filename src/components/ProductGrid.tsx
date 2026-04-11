@@ -8,15 +8,12 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({ products }: ProductGridProps) {
-  // Preload images for visible products (first 20 products)
-  // This helps cache images before user scrolls to them
   useEffect(() => {
     const visibleProducts = products.slice(0, 20);
     const imageUrls = visibleProducts
-      .map(p => p.imageUrl)
+      .map((p) => p.imageUrl)
       .filter((url): url is string => Boolean(url));
-    
-    // Preload unique image URLs only (avoid duplicates)
+
     const uniqueUrls = Array.from(new Set(imageUrls));
     if (uniqueUrls.length > 0) {
       preloadImages(uniqueUrls).catch(() => {
@@ -26,11 +23,16 @@ export default function ProductGrid({ products }: ProductGridProps) {
   }, [products]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 2xl:grid-cols-3">
+      {products.map((product, index) => (
+        <div
+          key={product.id}
+          className="fade-up"
+          style={{ animationDelay: `${index * 45}ms` }}
+        >
+          <ProductCard product={product} />
+        </div>
       ))}
     </div>
   );
 }
-

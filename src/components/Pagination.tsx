@@ -50,22 +50,22 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-8">
+    <div className="glass-panel mt-10 flex flex-col items-center justify-between gap-4 rounded-[28px] px-4 py-4 sm:flex-row sm:px-6">
       {/* Previous Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-200 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Previous
       </button>
 
       {/* Page Numbers */}
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         {pageNumbers.map((page, index) => {
           if (page === 'ellipsis') {
             return (
-              <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
+              <span key={`ellipsis-${index}`} className="px-2 text-slate-400">
                 ...
               </span>
             );
@@ -78,10 +78,10 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
             <button
               key={pageNum}
               onClick={() => onPageChange(pageNum)}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`h-10 min-w-10 rounded-full px-3 text-sm font-bold transition ${
                 isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-slate-950 text-white shadow-[0_14px_24px_rgba(15,23,42,0.18)]'
+                  : 'border border-slate-200 bg-white/90 text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700'
               }`}
             >
               {pageNum}
@@ -94,17 +94,10 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-200 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Next
       </button>
     </div>
   );
 }
-
-
-
-
-
-
-
