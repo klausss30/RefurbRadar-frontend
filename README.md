@@ -1,14 +1,14 @@
 # RefurbRadar
 
-RefurbRadar is a React and TypeScript browser for Apple refurbished products across 25 international storefronts. It reads RSS feed data through a server-side proxy, normalizes inconsistent product titles and prices into structured records, and provides fast client-side search, filtering, sorting, pagination, and cache-aware refresh controls.
+RefurbRadar is a React and TypeScript browser for Apple refurbished products across 25 international storefronts. It fetches raw feed data from a backend API, normalizes inconsistent product titles and prices in the frontend, and provides fast client-side search, filtering, sorting, pagination, and cache-aware refresh controls.
 
 ## Highlights
 
 - Multi-country product browsing with localized currency parsing
 - Category, keyword, price, and date-based client-side exploration
-- RSS/Atom XML parsing with product normalization for titles, prices, SKUs, specs, chips, RAM, storage, networking, and images
-- Browser caching for feed XML, parsed products, selected country, and image load state
-- IP-based country detection through a backend proxy endpoint
+- Raw feed parsing with product normalization for titles, prices, SKUs, specs, chips, RAM, storage, networking, and images
+- Browser caching for raw feed data, parsed products, selected country, and image load state
+- IP-based country detection through a backend API endpoint
 - Responsive Tailwind CSS interface with loading, error, empty, and cache status states
 - TypeScript, ESLint, and production build scripts for maintainable frontend development
 
@@ -28,26 +28,25 @@ RefurbRadar is a React and TypeScript browser for Apple refurbished products acr
 ```mermaid
 flowchart LR
   User["Browser"] --> ReactApp["React App"]
-  ReactApp --> Proxy["Backend Proxy"]
-  Proxy --> Feed["refurb-tracker.com RSS Feeds"]
-  Proxy --> Geo["IP Country Detection"]
+  ReactApp --> API["Backend API"]
   ReactApp --> LocalStorage["localStorage Cache"]
+  ReactApp --> Parser["Frontend Parser and Normalizer"]
   ReactApp --> UI["Filters, Sorting, Pagination"]
 ```
 
 ## Data Flow
 
 1. `useCountry` checks localStorage for a saved storefront.
-2. If no storefront is saved, `useCountry` calls `GET /api/ip/country` on the configured backend proxy.
-3. `useFeed` builds the source feed URL for the selected country and calls `fetchFeed`.
-4. `fetchFeed` calls `GET /api/feeds/:countryCode` on the backend proxy, then caches feed XML in localStorage.
-5. `parseFeed` converts RSS/Atom XML into raw feed items.
-6. `normalizeProducts` extracts product metadata and converts it into typed `Product` records.
+2. If no storefront is saved, `useCountry` calls `GET /api/ip/country` on the configured backend API.
+3. `useFeed` requests raw feed data for the selected storefront.
+4. `fetchFeed` calls `GET /api/feeds/:countryCode`, then caches the raw response in localStorage.
+5. `parseFeed` converts the raw response into feed items.
+6. `normalizeProducts` extracts product metadata in the frontend and converts it into typed `Product` records.
 7. `Home` applies category filters, search, sorting, and pagination in memory.
 
-## Backend Contract
+## API Contract
 
-This repository is the frontend only. It expects a backend proxy because RSS feeds and IP lookup should not be fetched directly from the browser in production.
+This repository is the frontend only. It expects a backend API that returns raw feed data and country detection data. Backend implementation details are outside the scope of this frontend project.
 
 Set the frontend environment variable:
 
@@ -55,7 +54,7 @@ Set the frontend environment variable:
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
-The backend should expose:
+The backend API should expose:
 
 ```txt
 GET /api/feeds/:countryCode
@@ -79,7 +78,7 @@ Returns one of these JSON shapes:
 { "isoCode": "NZ" }
 ```
 
-If the backend or geolocation endpoint is unavailable, the app falls back to New Zealand.
+If the API or geolocation endpoint is unavailable, the app falls back to New Zealand.
 
 ## Getting Started
 
@@ -87,7 +86,7 @@ If the backend or geolocation endpoint is unavailable, the app falls back to New
 
 - Node.js 20.19+ or 22.12+
 - npm
-- A compatible backend proxy configured with `VITE_API_BASE_URL`
+- A compatible backend API configured with `VITE_API_BASE_URL`
 
 ### Installation
 
@@ -114,7 +113,7 @@ npm run preview
 - `npm run build` runs TypeScript build checks and creates a production bundle
 - `npm run preview` previews the production build locally
 - `npm run lint` runs ESLint
-- `npm run fetch:feeds` downloads RSS XML files into `public/data/` for experiments or offline inspection
+- `npm run fetch:feeds` downloads feed XML files into `public/data/` for local experiments or offline inspection
 
 ## Repository Safety
 
@@ -196,22 +195,20 @@ The app handles several regional price formats:
 
 The app caches:
 
-- Feed XML for short-lived request reuse
+- Raw feed responses for short-lived request reuse
 - Parsed product lists for 30 minutes
 - Selected country preference
 - Image load state to reduce duplicate image work
 
 ## Troubleshooting
 
-### `Server proxy is not configured`
+### `Server API is not configured`
 
-Create `.env` from `.env.example` and set `VITE_API_BASE_URL` to your backend proxy.
+Create `.env` from `.env.example` and set `VITE_API_BASE_URL` to your backend API.
 
 ### Products do not load
 
-Confirm the backend proxy is running and that `GET /api/feeds/:countryCode` returns XML, not HTML or JSON.
-
-If users in a restricted network region cannot load products, deploy the backend proxy in a region that can reach `refurb-tracker.com` and is reachable by your target users. The frontend intentionally avoids public CORS proxy services.
+Confirm the backend API is running and that `GET /api/feeds/:countryCode` returns the raw feed payload expected by the frontend parser.
 
 ### Country detection always uses New Zealand
 
