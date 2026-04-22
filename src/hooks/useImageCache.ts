@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 
+type ImageCacheStatus = 'loading' | 'loaded' | 'error';
+type ImageStatus = 'idle' | ImageCacheStatus;
+
 /**
  * Global image cache to track loaded images across all components
  * This prevents duplicate loading of the same image URL
  */
-const imageCache = new Map<string, 'loading' | 'loaded' | 'error'>();
+const imageCache = new Map<string, ImageCacheStatus>();
 const imageLoadCallbacks = new Map<string, Set<(status: 'loaded' | 'error') => void>>();
 
 /**
@@ -77,23 +80,21 @@ function preloadImage(src: string): Promise<void> {
  * @returns Object with image loading state
  */
 export function useImageCache(src: string | undefined) {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
+  const [status, setStatus] = useState<ImageStatus>(() => {
+    if (!src) return 'error';
+    return imageCache.get(src) ?? 'idle';
+  });
   const hasStartedRef = useRef(false);
+
+  const cachedStatus = src ? imageCache.get(src) : 'error';
+  const resolvedStatus = cachedStatus ?? status;
 
   useEffect(() => {
     if (!src) {
-      setStatus('error');
       return;
     }
 
-    // Check if already cached
-    const cachedStatus = imageCache.get(src);
-    if (cachedStatus === 'loaded') {
-      setStatus('loaded');
-      return;
-    }
-    if (cachedStatus === 'error') {
-      setStatus('error');
+    if (imageCache.get(src)) {
       return;
     }
 
@@ -103,7 +104,6 @@ export function useImageCache(src: string | undefined) {
     }
 
     hasStartedRef.current = true;
-    setStatus('loading');
 
     // Preload the image
     preloadImage(src)
@@ -115,21 +115,11 @@ export function useImageCache(src: string | undefined) {
       });
   }, [src]);
 
-  // Reset when src changes
   useEffect(() => {
     hasStartedRef.current = false;
-    if (src && imageCache.get(src)) {
-      // If already cached, update status immediately
-      const cachedStatus = imageCache.get(src);
-      if (cachedStatus === 'loaded') {
-        setStatus('loaded');
-      } else if (cachedStatus === 'error') {
-        setStatus('error');
-      }
-    }
   }, [src]);
 
-  return status;
+  return resolvedStatus;
 }
 
 /**
@@ -165,9 +155,6 @@ export function getImageCacheStats() {
     errors: Array.from(imageCache.values()).filter(s => s === 'error').length,
   };
 }
-
-
-
 
 
 

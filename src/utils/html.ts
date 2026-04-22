@@ -86,7 +86,7 @@ export function extractOverviewItems(specsText: string): string[] {
   if (!specsText) return [];
   
   // Remove CDATA markers and other unwanted characters
-  let cleanedText = specsText
+  const cleanedText = specsText
     .replace(/\]\]>/g, '') // Remove CDATA end marker
     .replace(/<!\[CDATA\[/g, '') // Remove CDATA start marker
     .replace(/[¹²³⁴⁵⁶⁷⁸⁹⁰]/g, '') // Remove superscript numbers
@@ -261,4 +261,3 @@ export function extractOverviewItems(specsText: string): string[] {
   
   return lines;
 }
-

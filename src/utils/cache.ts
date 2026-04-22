@@ -96,7 +96,7 @@ export function getCacheAge(url: string): number | null {
     
     const timestamp = parseInt(cachedTimestamp, 10);
     return Date.now() - timestamp;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -192,4 +192,3 @@ export function formatCacheAge(ageInMs: number): string {
     return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
   }
 }
-

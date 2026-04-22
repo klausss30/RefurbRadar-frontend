@@ -1,429 +1,225 @@
 # RefurbRadar
 
-A radar-style Apple refurbished product browser built with React, TypeScript, and Vite. RefurbRadar fetches refurbished products from RSS feeds, normalizes them into structured data, and provides fast client-side filtering, categorization, and sorting across multiple countries.
+RefurbRadar is a React and TypeScript browser for Apple refurbished products across 25 international storefronts. It reads RSS feed data through a server-side proxy, normalizes inconsistent product titles and prices into structured records, and provides fast client-side search, filtering, sorting, pagination, and cache-aware refresh controls.
 
-## Features
+## Highlights
 
-- 🌍 **Multi-Country Support** - Browse refurbished products from 25+ countries
-- 🗺️ **IP Auto-Detection** - Automatically selects your country on first visit
-- 📡 **Feed Management** - Build-time feed fetching to avoid CORS issues
-- 🔍 **Real-time Filtering** - Filter by category and search
-- 📊 **Multiple Sorting Options** - Sort by newest, price low→high, price high→low
-- 🎨 **Modern, Responsive UI** - Built with Tailwind CSS
-- ⚡ **Fast Client-Side Processing** - No backend needed
-- 📱 **Mobile-Friendly** - Optimized for all screen sizes
-- 🖼️ **Image Caching** - Smart image loading to reduce duplicate requests
-- 💾 **Product Data Caching** - Caches parsed product data with 30-minute expiration
-- 🔄 **Cache Refresh** - Manual cache refresh button to force data reload
-- 📊 **Cache Information** - View cache status, age, size, and storage location
-- ⏱️ **Relative Time Display** - Shows "X minutes ago" for last updated time
-- 🌐 **English Interface** - Fully localized English user interface
+- Multi-country product browsing with localized currency parsing
+- Category, keyword, price, and date-based client-side exploration
+- RSS/Atom XML parsing with product normalization for titles, prices, SKUs, specs, chips, RAM, storage, networking, and images
+- Browser caching for feed XML, parsed products, selected country, and image load state
+- IP-based country detection through a backend proxy endpoint
+- Responsive Tailwind CSS interface with loading, error, empty, and cache status states
+- TypeScript, ESLint, and production build scripts for maintainable frontend development
 
 ## Tech Stack
 
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Styling
-- **Browser Fetch API** - Local feed fetching
-- **DOMParser** - RSS/Atom XML parsing
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- ESLint
+- Browser Fetch API
+- DOMParser
+- Vercel Analytics
 
 ## Architecture
 
-### Data Flow
-
-1. **Feed Fetching (Build-Time)** (`scripts/fetchFeeds.mjs`)
-
-   - Downloads RSS feeds for all countries from `refurb-tracker.com`
-   - Saves feeds to `public/data/{code}_in_all.xml`
-   - Runs as a Node.js script before build/deploy
-
-2. **Country Selection** (`src/hooks/useCountry.ts`)
-
-   - Checks localStorage for saved preference
-   - Falls back to IP geolocation (first visit only)
-   - Maps ISO country codes to feed codes
-   - Defaults to New Zealand (NZ) if detection fails
-
-3. **Feed Loading** (`src/hooks/useFeed.ts`)
-
-   - Fetches feed from same-origin `/data/{code}_in_all.xml`
-   - Avoids CORS by using local files
-   - Parses and normalizes products
-   - Caches parsed product data in localStorage with 30-minute expiration
-   - Provides manual refresh function to bypass cache
-   - Returns cache metadata (age, size, timestamp) for display
-
-4. **Product Normalization** (`src/api/normalizeProduct.ts`)
-
-   - Converts RSS items into structured `Product` objects
-   - Extracts price, image, SKU, specs from HTML description
-   - Detects category, chip, RAM, storage, network from text
-   - Cleans product titles (removes SKU, price, non-English refurbished prefixes)
-   - Preserves "Refurbished" prefix in English titles
-   - Filters out redundant information from product specifications
-
-5. **Frontend Processing** (`src/pages/Home.tsx`)
-
-   - Loads products based on selected country
-   - Applies filters and sorting in real-time using `useMemo`
-   - Updates UI when country changes
-   - Provides refresh function to Header component for cache management
-
-6. **UI Components** (`src/components/Header.tsx`)
-   - Displays country selector and refresh button
-   - Shows relative time for last cache update
-   - Provides cache information popup with storage location, status, age, and size
-
-### Caching Strategy
-
-**Product Data Caching:**
-
-The app uses a two-tier caching strategy:
-
-1. **Feed Files (Build-time)**: RSS feeds are downloaded at build time to avoid CORS issues
-2. **Product Data (Runtime)**: Parsed product data is cached in `localStorage` for 30 minutes
-
-**Cache Management:**
-
-- **Automatic**: Cache is checked on page load; valid cache (< 30 minutes old) is used immediately
-- **Manual Refresh**: Users can click the "Refresh Cache" button to force a reload
-- **Cache Info**: Shows cache status, age, size, and storage location (localStorage)
-- **Country-Specific**: Each country has its own cache entry
-- **Storage Location**: All caches are stored in browser `localStorage`
-
-### CORS Strategy
-
-**Why build-time fetching?**
-
-RefurbRadar uses a build-time feed fetching strategy instead of runtime fetching for several reasons:
-
-1. **CORS Restrictions**: The `refurb-tracker.com` RSS feeds don't allow cross-origin requests from browsers
-2. **Reliability**: Build-time fetching ensures feeds are available even if the source is temporarily down
-3. **Performance**: Local files load faster than external requests
-4. **Offline Capability**: Once downloaded, feeds work offline
-
-**How it works:**
-
-1. Run `npm run fetch:feeds` to download feeds
-2. Feeds are saved to `public/data/{country_code}_in_all.xml`
-3. The app fetches from same-origin (`/data/{code}_in_all.xml`)
-4. No CORS issues since files are on the same domain
-5. Parsed products are cached in localStorage for 30 minutes per country
-
-### IP Geolocation
-
-**How IP detection works:**
-
-1. On first visit (no localStorage), the app attempts IP geolocation
-2. Uses free public APIs:
-   - Primary: `ipapi.co/json` (no API key required)
-   - Fallback: `ipinfo.io/json` (no API key required)
-3. Maps returned ISO country codes (e.g., `US`, `GB`) to feed codes (e.g., `us`, `uk`)
-4. Saves detected country to localStorage for future visits
-5. Falls back to New Zealand (`nz`) if detection fails
-
-**ISO to Feed Code Mapping:**
-
-- `AU` → `au` (Australia)
-- `BE` → `be` (Belgique - default for Belgium)
-- `CA` → `ca` (Canada English - default for Canada)
-- `CN` → `cn` (China)
-- `DE` → `de` (Deutschland)
-- `ES` → `es` (España)
-- `FR` → `fr` (France)
-- `HK` → `hk` (Hong-Kong English - default for Hong Kong)
-- `IE` → `ie` (Ireland)
-- `IT` → `it` (Italia)
-- `JP` → `jp` (Japan)
-- `NL` → `nl` (Nederland)
-- `NZ` → `nz` (New Zealand)
-- `AT` → `at` (Österreich)
-- `PL` → `pl` (Polska)
-- `SG` → `sg` (Singapore)
-- `KR` → `kr` (South Korea)
-- `CH` → `ch` (Suisse - default for Switzerland)
-- `TW` → `tw` (Taiwan)
-- `GB` → `uk` (United Kingdom)
-- `US` → `us` (United States)
-
-### Adding New Countries
-
-To add support for a new country:
-
-1. **Add to country list** (`src/config/countries.ts`):
-
-   ```typescript
-   export const COUNTRIES: Country[] = [
-     // ... existing countries
-     { code: "xx", label: "New Country Name" },
-   ];
-   ```
-
-2. **Add ISO mapping** (if needed, in `src/config/countries.ts`):
-
-   ```typescript
-   const ISO_TO_FEED_CODE: Record<string, string> = {
-     // ... existing mappings
-     XX: "xx", // New Country
-   };
-   ```
-
-3. **Update TypeScript types** (`src/types/product.ts`):
-
-   ```typescript
-   export type Country = "au" | "bx" | ... | "xx";
-   ```
-
-4. **Add to fetch script** (`scripts/fetchFeeds.mjs`):
-
-   ```javascript
-   const COUNTRIES = [
-     // ... existing codes
-     "xx",
-   ];
-   ```
-
-5. **Run fetch script**:
-
-   ```bash
-   npm run fetch:feeds
-   ```
-
-6. **Test**: Verify the feed file exists at `public/data/xx_in_all.xml`
-
-### Folder Structure
-
+```mermaid
+flowchart LR
+  User["Browser"] --> ReactApp["React App"]
+  ReactApp --> Proxy["Backend Proxy"]
+  Proxy --> Feed["refurb-tracker.com RSS Feeds"]
+  Proxy --> Geo["IP Country Detection"]
+  ReactApp --> LocalStorage["localStorage Cache"]
+  ReactApp --> UI["Filters, Sorting, Pagination"]
 ```
-src/
-  api/                    # RSS feed handling
-    fetchFeed.ts         # (Legacy - not used in new architecture)
-    parseFeed.ts         # Parse RSS/Atom XML
-    normalizeProduct.ts  # Convert RSS items to Product objects
-  components/            # React components
-    CategoryFilter.tsx   # Category filter buttons
-    CountrySelect.tsx    # Country dropdown selector
-    Header.tsx           # App header with country selector, refresh button, and cache info
-    ProductCard.tsx      # Individual product card
-    ProductGrid.tsx      # Grid of product cards
-    SpecFilters.tsx      # Search and filter inputs
-    States.tsx           # Loading/Error/Empty states
-  config/
-    countries.ts         # Country list and mappings
-  hooks/
-    useCountry.ts        # Country selection with IP detection
-    useFeed.ts           # Load feed for selected country
-    useImageCache.ts     # Image loading optimization
-  pages/
-    Home.tsx             # Main page component
-  types/
-    product.ts           # TypeScript type definitions
-  utils/
-    cache.ts             # Feed caching utilities
-    category.ts          # Category detection and title cleaning
-    format.ts            # Formatting helpers (price, date, relative time)
-    html.ts              # HTML parsing utilities and overview extraction
-    regex.ts             # Regex extraction utilities (price, SKU, specs)
-scripts/
-  fetchFeeds.mjs        # Build-time feed downloader
-public/
-  data/                 # Feed XML files (generated)
-    {code}_in_all.xml
+
+## Data Flow
+
+1. `useCountry` checks localStorage for a saved storefront.
+2. If no storefront is saved, `useCountry` calls `GET /api/ip/country` on the configured backend proxy.
+3. `useFeed` builds the source feed URL for the selected country and calls `fetchFeed`.
+4. `fetchFeed` calls `GET /api/feeds/:countryCode` on the backend proxy, then caches feed XML in localStorage.
+5. `parseFeed` converts RSS/Atom XML into raw feed items.
+6. `normalizeProducts` extracts product metadata and converts it into typed `Product` records.
+7. `Home` applies category filters, search, sorting, and pagination in memory.
+
+## Backend Contract
+
+This repository is the frontend only. It expects a backend proxy because RSS feeds and IP lookup should not be fetched directly from the browser in production.
+
+Set the frontend environment variable:
+
+```bash
+VITE_API_BASE_URL=http://localhost:3000
 ```
+
+The backend should expose:
+
+```txt
+GET /api/feeds/:countryCode
+```
+
+```txt
+GET /api/ip/country
+```
+
+Returns one of these JSON shapes:
+
+```json
+{ "countryCode": "nz" }
+```
+
+```json
+{ "country_code": "NZ" }
+```
+
+```json
+{ "isoCode": "NZ" }
+```
+
+If the backend or geolocation endpoint is unavailable, the app falls back to New Zealand.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 20.19+ or 22.12+
-- npm or yarn
+- npm
+- A compatible backend proxy configured with `VITE_API_BASE_URL`
 
 ### Installation
 
-1. Clone the repository:
+```bash
+git clone <repository-url>
+cd RefurbRadar-frontend
+npm install
+cp .env.example .env
+npm run dev
+```
 
-   ```bash
-   git clone <repository-url>
-   cd RefurbRadar-frontend
-   ```
+Open `http://localhost:5173`.
 
-2. Install dependencies:
+### Production Build
 
-   ```bash
-   npm install
-   ```
-
-3. **Download feeds** (required before running):
-
-   ```bash
-   npm run fetch:feeds
-   ```
-
-   This downloads RSS feeds for all countries to `public/data/`. The script will:
-
-   - Create the `public/data/` directory if it doesn't exist
-   - Download feeds sequentially (to be respectful to the server)
-   - Save each feed as `{country_code}_in_all.xml`
-   - Show progress and summary
-
-   **Note**: This step must be completed before running the dev server, otherwise feeds won't be available.
-
-4. Start the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-5. Open your browser:
-   ```
-   http://localhost:5173
-   ```
-
-### Development Workflow
-
-1. **Before starting development**: Always run `npm run fetch:feeds` to ensure feeds are up-to-date
-2. **During development**: Make code changes, hot reload will handle the rest
-3. **Testing country changes**: Change country in the dropdown to test different feeds
-4. **Checking feeds**: Verify feed files exist in `public/data/` directory
-
-### Build for Production
-
-1. **Download/update feeds**:
-
-   ```bash
-   npm run fetch:feeds
-   ```
-
-2. **Build the app**:
-
-   ```bash
-   npm run build
-   ```
-
-3. **Preview production build**:
-
-   ```bash
-   npm run preview
-   ```
-
-4. **Deploy**: The `dist/` folder contains the production build. Include the `public/data/` folder in your deployment.
+```bash
+npm run build
+npm run preview
+```
 
 ## Available Scripts
 
-- `npm run fetch:feeds` - Download all country feeds to `public/data/`
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+- `npm run dev` starts the Vite development server
+- `npm run build` runs TypeScript build checks and creates a production bundle
+- `npm run preview` previews the production build locally
+- `npm run lint` runs ESLint
+- `npm run fetch:feeds` downloads RSS XML files into `public/data/` for experiments or offline inspection
+
+## Repository Safety
+
+The repository is prepared for public GitHub use:
+
+- `.env`, `.env.local`, production env files, `node_modules`, `dist`, and generated XML feeds are ignored.
+- `.env.example` documents the required public environment variable without including secrets.
+- No API keys, passwords, bearer tokens, private keys, or credentials are committed.
+
+Do not commit:
+
+- Real `.env` files
+- Private backend URLs if you do not want them public
+- API keys or provider tokens
+- Generated `public/data/*.xml` feed files
+- Deployment secrets
+
+## Project Structure
+
+```txt
+src/
+  api/
+    fetchFeed.ts
+    normalizeProduct.ts
+    parseFeed.ts
+  components/
+    CategoryFilter.tsx
+    CountrySelect.tsx
+    Header.tsx
+    Pagination.tsx
+    ProductCard.tsx
+    ProductGrid.tsx
+    SpecFilters.tsx
+    States.tsx
+  config/
+    countries.ts
+  hooks/
+    useCountry.ts
+    useFeed.ts
+    useImageCache.ts
+  pages/
+    Home.tsx
+  types/
+    product.ts
+  utils/
+    cache.ts
+    category.ts
+    format.ts
+    html.ts
+    regex.ts
+scripts/
+  fetchFeeds.mjs
+public/
+  logo.PNG
+```
 
 ## Supported Countries
 
-RefurbRadar supports the following countries (25 total):
+RefurbRadar supports 25 storefront feed codes:
 
-1. Australia (`au`)
-2. België (`bx`)
-3. Belgique (`be`)
-4. Canada (English) (`ca`)
-5. Canada (Français) (`xf`)
-6. 中国 / China (`cn`)
-7. Deutschland (`de`)
-8. España (`es`)
-9. France (`fr`)
-10. Hong-Kong (English) (`hk`)
-11. Hong-Kong (汉语) (`hz`)
-12. Ireland (`ie`)
-13. Italia (`it`)
-14. 日本 / Japan (`jp`)
-15. Nederland (`nl`)
-16. New Zealand (`nz`) - Default
-17. Österreich (`at`)
-18. Polska (`pl`)
-19. Singapore (`sg`)
-20. 한국 / South Korea (`kr`)
-21. Schweiz (`cx`)
-22. Suisse (`ch`)
-23. 台灣 / Taiwan (`tw`)
-24. United Kingdom (`uk`)
-25. United States (`us`)
+`au`, `bx`, `be`, `ca`, `xf`, `cn`, `de`, `es`, `fr`, `hk`, `hz`, `ie`, `it`, `jp`, `nl`, `nz`, `at`, `pl`, `sg`, `kr`, `cx`, `ch`, `tw`, `uk`, `us`.
 
-## Data Processing
+## Implementation Notes
 
-### Product Title Cleaning
+### Product Normalization
 
-Product titles are cleaned to remove redundant information:
-
-- **SKU Removal**: Removes SKU patterns (e.g., `- FUWA3ZM/A`)
-- **Price Removal**: Removes price information from titles (handles multiple currency formats)
-- **Refurbished Prefixes**: Removes non-English refurbished prefixes (French, Dutch, etc.)
-- **Refurbished Preservation**: Keeps "Refurbished" prefix in English titles for clarity
+Product titles and descriptions are cleaned to remove redundant SKUs, prices, localized refurbished prefixes, strikethrough prices, and duplicate specification text. English "Refurbished" prefixes are preserved for clarity.
 
 ### Price Extraction
 
-The app extracts prices from multiple formats:
+The app handles several regional price formats:
 
-- **US/UK Format**: `$1,299.00`, `£459.00`
-- **European Format**: `€ 79,00` or `79,00 €` (comma decimal, dot/space thousands)
-- **Asian Formats**: `¥295,800`, `₩4,964,000`, `HK$22,699.00`
-- **Swiss Formats**: `CHF 1'599.00` (apostrophe thousands) or `1 599.00 CHF` (space thousands)
-- **Currency-Specific Patterns**: Each country has its own price pattern regex for accurate extraction
+- `$1,299.00`, `£459.00`
+- `€ 79,00`, `79,00 €`, `4 619,00 €`
+- `¥295,800`, `₩4,964,000`, `HK$22,699.00`
+- `CHF 1'599.00`, `1 599.00 CHF`
 
-### Specification Filtering
+### Caching
 
-Product specifications are filtered to remove:
+The app caches:
 
-- Product titles that appear in specifications
-- Price information that appears in specifications
-- Redundant "refurbished" indicators in various languages
-- Strikethrough prices and discount percentages
+- Feed XML for short-lived request reuse
+- Parsed product lists for 30 minutes
+- Selected country preference
+- Image load state to reduce duplicate image work
 
 ## Troubleshooting
 
-### Feed file not found
+### `Server proxy is not configured`
 
-**Error**: `Feed file not found for {country}. Please run "npm run fetch:feeds"`
+Create `.env` from `.env.example` and set `VITE_API_BASE_URL` to your backend proxy.
 
-**Solution**: Run `npm run fetch:feeds` to download the feed files.
+### Products do not load
 
-### Cache not updating
+Confirm the backend proxy is running and that `GET /api/feeds/:countryCode` returns XML, not HTML or JSON.
 
-**Issue**: Changes to feeds not reflected after refresh
+If users in a restricted network region cannot load products, deploy the backend proxy in a region that can reach `refurb-tracker.com` and is reachable by your target users. The frontend intentionally avoids public CORS proxy services.
 
-**Solution**:
+### Country detection always uses New Zealand
 
-- Click the "Refresh Cache" button to force a reload
-- Clear browser localStorage if needed: `localStorage.clear()` in browser console
-- Cache expires after 30 minutes automatically
-- Each country has its own cache entry
+Confirm `GET /api/ip/country` is available. The app falls back to New Zealand when geolocation fails.
 
-### IP geolocation not working
+### Local cache looks stale
 
-**Issue**: App always defaults to New Zealand
-
-**Solution**:
-
-- Check browser console for geolocation errors
-- Geolocation requires internet connection
-- If geolocation fails, manually select your country from the dropdown
-- Selected country is saved in localStorage for future visits
-
-### Build fails
-
-**Error**: TypeScript compilation errors
-
-**Solution**:
-
-- Ensure all country codes are added to `Country` type in `src/types/product.ts`
-- Check that feed codes match exactly (case-sensitive)
-
-### CORS errors
-
-**Issue**: Seeing CORS errors in console
-
-**Solution**:
-
-- Make sure you're fetching from local files (`/data/{code}_in_all.xml`), not external URLs
-- Verify feeds were downloaded to `public/data/`
-- Check that you're not trying to fetch from `refurb-tracker.com` directly
+Use the refresh button in the app, or clear localStorage in the browser devtools.
 
 ## License
 

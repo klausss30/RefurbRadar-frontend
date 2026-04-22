@@ -41,9 +41,9 @@ export function extractPrice(text: string, pattern: RegExp = /\$([\d,]+(\.\d{2})
       // Replace last comma with dot, remove all other separators (dots and spaces)
       cleaned = trimmed
         .substring(0, lastCommaIndex)
-        .replace(/[\s\.]/g, '') + '.' + trimmed.substring(lastCommaIndex + 1).replace(/\D/g, '');
+        .replace(/[\s.]/g, '') + '.' + trimmed.substring(lastCommaIndex + 1).replace(/\D/g, '');
     } else {
-      cleaned = trimmed.replace(/[\s\.]/g, '');
+      cleaned = trimmed.replace(/[\s.]/g, '');
     }
   } else if (hasDotDecimal) {
     // US/UK format: dot as decimal, comma/apostrophe as thousands
@@ -62,17 +62,17 @@ export function extractPrice(text: string, pattern: RegExp = /\$([\d,]+(\.\d{2})
       if (afterSeparator.length === 2) {
         // Likely decimal separator
         if (lastComma > lastDot) {
-          cleaned = priceStr.replace(/[\s\.]/g, '').replace(',', '.');
+          cleaned = priceStr.replace(/[\s.]/g, '').replace(',', '.');
         } else {
           cleaned = priceStr.replace(/,/g, '');
         }
       } else {
         // Likely thousands separator - remove all separators
-        cleaned = priceStr.replace(/[,\s\.]/g, '');
+        cleaned = priceStr.replace(/[,\s.]/g, '');
       }
     } else {
       // No separator, just digits
-      cleaned = priceStr.replace(/[,\s\.]/g, '');
+      cleaned = priceStr.replace(/[,\s.]/g, '');
     }
   }
   
@@ -143,4 +143,3 @@ export function extractSizeInch(text: string): number | undefined {
   const size = parseFloat(match[1]);
   return isNaN(size) ? undefined : size;
 }
-
