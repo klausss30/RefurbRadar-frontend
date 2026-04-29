@@ -28,7 +28,42 @@ export function extractText(html: string): string {
  */
 export function extractFirstImageSrc(html: string): string | undefined {
   if (!html) return undefined;
-  
+
+  const normalizeImageUrl = (value: string | null | undefined): string | undefined => {
+    if (!value) return undefined;
+
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = value.trim();
+    let url = textarea.value.trim();
+
+    if (!url) return undefined;
+    if (url.startsWith('//')) url = `https:${url}`;
+
+    if (url.includes('as-images.apple.com')) {
+      url = url
+        .replace(/([?&])wid=\d+/, '$1wid=640')
+        .replace(/([?&])hei=\d+/, '$1hei=640');
+    }
+
+    return url;
+  };
+
+  const pickFromSrcSet = (srcset: string | null | undefined): string | undefined => {
+    if (!srcset) return undefined;
+
+    const candidates = srcset
+      .split(',')
+      .map((candidate) => {
+        const [url, descriptor = ''] = candidate.trim().split(/\s+/, 2);
+        const size = Number.parseFloat(descriptor.replace(/[^\d.]/g, '')) || 0;
+        return { url, size };
+      })
+      .filter((candidate) => candidate.url)
+      .sort((a, b) => b.size - a.size);
+
+    return normalizeImageUrl(candidates[0]?.url);
+  };
+
   // Try multiple extraction methods
   let src: string | null = null;
   
@@ -37,7 +72,13 @@ export function extractFirstImageSrc(html: string): string | undefined {
     const div = document.createElement('div');
     div.innerHTML = html;
     const img = div.querySelector('img');
-    src = img?.getAttribute('src') || null;
+    src =
+      img?.getAttribute('src') ||
+      img?.getAttribute('data-src') ||
+      img?.getAttribute('data-original') ||
+      pickFromSrcSet(img?.getAttribute('srcset')) ||
+      pickFromSrcSet(img?.getAttribute('data-srcset')) ||
+      null;
   } catch (e) {
     console.warn('Failed to parse HTML with DOMParser:', e);
   }
@@ -57,24 +98,28 @@ export function extractFirstImageSrc(html: string): string | undefined {
       src = imgTagMatch[1];
     }
   }
+
+  if (!src) {
+    const lazyMatch = html.match(/<img[^>]*(?:data-src|data-original)\s*=\s*["']([^"']+)["']/i);
+    if (lazyMatch && lazyMatch[1]) {
+      src = lazyMatch[1];
+    }
+  }
+
+  if (!src) {
+    const srcsetMatch = html.match(/<img[^>]*(?:srcset|data-srcset)\s*=\s*["']([^"']+)["']/i);
+    const srcsetUrl = pickFromSrcSet(srcsetMatch?.[1]);
+    if (srcsetUrl) {
+      return srcsetUrl;
+    }
+  }
   
   if (!src) {
     console.warn('No image URL found in HTML:', html.substring(0, 200));
     return undefined;
   }
   
-  // Clean up the URL (remove query parameters if needed, but keep Apple URLs intact)
-  src = src.trim();
-  
-  // Optimize Apple Store image URLs for better quality
-  // Change from wid=320&hei=320 to wid=640&hei=640 for higher resolution
-  if (src.includes('as-images.apple.com')) {
-    src = src
-      .replace(/wid=\d+/, 'wid=640')
-      .replace(/hei=\d+/, 'hei=640');
-  }
-  
-  return src;
+  return normalizeImageUrl(src);
 }
 
 /**

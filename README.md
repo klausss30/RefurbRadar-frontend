@@ -52,6 +52,7 @@ Set the frontend environment variable:
 
 ```bash
 VITE_API_BASE_URL=http://localhost:3000
+VITE_SITE_URL=https://refurbradar.com
 ```
 
 The backend API should expose:
@@ -113,6 +114,7 @@ npm run preview
 - `npm run build` runs TypeScript build checks and creates a production bundle
 - `npm run preview` previews the production build locally
 - `npm run lint` runs ESLint
+- `npm run generate:sitemap` regenerates `public/sitemap.xml` from `VITE_SITE_URL`
 - `npm run fetch:feeds` downloads feed XML files into `public/data/` for local experiments or offline inspection
 
 ## Repository Safety

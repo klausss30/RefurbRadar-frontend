@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://refurbradar.com/sitemap.xml

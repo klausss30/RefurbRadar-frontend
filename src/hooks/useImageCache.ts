@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 type ImageCacheStatus = 'loading' | 'loaded' | 'error';
 type ImageStatus = 'idle' | ImageCacheStatus;
@@ -80,43 +80,33 @@ function preloadImage(src: string): Promise<void> {
  * @returns Object with image loading state
  */
 export function useImageCache(src: string | undefined) {
-  const [status, setStatus] = useState<ImageStatus>(() => {
-    if (!src) return 'error';
-    return imageCache.get(src) ?? 'idle';
-  });
-  const hasStartedRef = useRef(false);
+  const [status, setStatus] = useState<{ src: string | undefined; status: ImageStatus }>(() => ({
+    src,
+    status: src ? imageCache.get(src) ?? 'idle' : 'error',
+  }));
 
   const cachedStatus = src ? imageCache.get(src) : 'error';
-  const resolvedStatus = cachedStatus ?? status;
+  const resolvedStatus =
+    cachedStatus ?? (status.src === src && status.status !== 'idle' ? status.status : 'loading');
 
   useEffect(() => {
     if (!src) {
       return;
     }
 
-    if (imageCache.get(src)) {
+    const cached = imageCache.get(src);
+    if (cached === 'loaded' || cached === 'error') {
       return;
     }
 
-    // Don't start loading multiple times
-    if (hasStartedRef.current) {
-      return;
-    }
-
-    hasStartedRef.current = true;
-
-    // Preload the image
+    // Preload the image. If another caller already started it, preloadImage subscribes this hook.
     preloadImage(src)
       .then(() => {
-        setStatus('loaded');
+        setStatus({ src, status: 'loaded' });
       })
       .catch(() => {
-        setStatus('error');
+        setStatus({ src, status: 'error' });
       });
-  }, [src]);
-
-  useEffect(() => {
-    hasStartedRef.current = false;
   }, [src]);
 
   return resolvedStatus;
@@ -155,8 +145,5 @@ export function getImageCacheStats() {
     errors: Array.from(imageCache.values()).filter(s => s === 'error').length,
   };
 }
-
-
-
 
 

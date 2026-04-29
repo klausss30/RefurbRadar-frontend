@@ -21,6 +21,17 @@ export function useCountry() {
   useEffect(() => {
     async function initializeCountry() {
       try {
+        const countryFromUrl = new URLSearchParams(window.location.search).get('country');
+        if (countryFromUrl) {
+          const urlCountry = COUNTRIES.find(c => c.code === countryFromUrl.toLowerCase());
+          if (urlCountry) {
+            setCountryCode(urlCountry.code);
+            localStorage.setItem(STORAGE_KEY, urlCountry.code);
+            setIsDetecting(false);
+            return;
+          }
+        }
+
         // Step 1: Check localStorage
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
@@ -173,4 +184,3 @@ async function detectCountryFromIP(): Promise<string | null> {
     return null;
   }
 }
-

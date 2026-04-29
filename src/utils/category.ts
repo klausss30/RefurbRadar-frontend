@@ -25,8 +25,20 @@ export function detectCategory(title: string): Category {
     return "iPad";
   }
 
+  // Apple Watch
+  // Check before iPhone because Watch specs can mention iPhone features such as Precision Finding.
+  if (
+    normalized.includes("apple watch") ||
+    normalized.includes("watch series") ||
+    normalized.includes("watch se") ||
+    /\bwatch\s+(ultra|series|se)\b/.test(normalized) ||
+    /\b(series\s+\d+|se|ultra)\b.*\b(gps|cellular|aluminium|aluminum|stainless|titanium)\b/.test(normalized)
+  ) {
+    return "Apple Watch";
+  }
+
   // iPhone
-  if (normalized.includes("iphone")) return "iPhone";
+  if (/\biphone\b/.test(normalized)) return "iPhone";
 
   // MacBook variants (must check "air" and "pro" before general "macbook")
   // Also check for "macbook" as one word or "mac book" separated
@@ -47,18 +59,6 @@ export function detectCategory(title: string): Category {
     return "Mac Mini";
   if (normalized.includes("imac") || normalized.includes("i mac"))
     return "iMac";
-
-  // Apple Watch
-  // Check various formats: "Apple Watch", "Watch Series", "Watch SE"
-  if (
-    normalized.includes("apple watch") ||
-    normalized.includes("watch series") ||
-    normalized.includes("watch se") ||
-    (normalized.includes("watch") &&
-      (normalized.includes("series") || normalized.includes("se")))
-  ) {
-    return "Apple Watch";
-  }
 
   // Apple TV
   if (normalized.includes("apple tv")) return "Apple TV";

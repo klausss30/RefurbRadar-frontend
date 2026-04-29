@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "fetch:feeds": "node scripts/fetchFeeds.mjs",
+    "generate:sitemap": "node scripts/generateSitemap.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

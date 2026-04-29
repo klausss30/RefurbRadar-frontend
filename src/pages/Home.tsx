@@ -1,7 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { Category } from '../types/product';
 import { useCountry } from '../hooks/useCountry';
 import { useFeed } from '../hooks/useFeed';
+import { DEFAULT_COUNTRY } from '../config/countries';
+import SEO from '../components/SEO';
 import Header from '../components/Header';
 import CategoryFilter from '../components/CategoryFilter';
 import SpecFilters from '../components/SpecFilters';
@@ -30,12 +32,26 @@ const CATEGORY_ORDER: Category[] = [
 
 const SHELL_CLASS = 'relative min-h-screen pb-12 text-slate-900';
 
+function getInitialCategories(): Set<Category> {
+  const params = new URLSearchParams(window.location.search);
+  const categories = params
+    .getAll('category')
+    .flatMap((value) => value.split(','))
+    .filter((value): value is Category => CATEGORY_ORDER.includes(value as Category));
+
+  return new Set(categories);
+}
+
+function getInitialSearchQuery(): string {
+  return new URLSearchParams(window.location.search).get('q') || '';
+}
+
 export default function Home() {
   const { countryCode, country, updateCountry, isDetecting, countries } = useCountry();
   const { products, loading, error, lastUpdated, refresh } = useFeed(countryCode, country);
 
-  const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(() => getInitialCategories());
+  const [searchQuery, setSearchQuery] = useState(() => getInitialSearchQuery());
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -98,6 +114,36 @@ export default function Home() {
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
   const activeFilterCount = selectedCategories.size + (searchQuery.trim() ? 1 : 0);
+  const selectedCategoryList = useMemo(() => Array.from(selectedCategories), [selectedCategories]);
+  const primaryCategory = selectedCategoryList[0];
+  const pageTitle = primaryCategory
+    ? `Refurbished ${primaryCategory} Deals in ${country.label} | RefurbRadar`
+    : `Apple Refurbished Deals in ${country.label} | RefurbRadar`;
+  const pageDescription = primaryCategory
+    ? `Track refurbished ${primaryCategory} inventory, prices, and availability from the Apple Store in ${country.label}.`
+    : `Browse Apple refurbished Mac, iPad, iPhone, Apple Watch, and accessory deals from the Apple Store in ${country.label}.`;
+  const canonicalPath = useMemo(() => {
+    const params = new URLSearchParams();
+
+    if (countryCode !== DEFAULT_COUNTRY || selectedCategoryList.length > 0 || searchQuery.trim()) {
+      params.set('country', countryCode);
+    }
+
+    selectedCategoryList.forEach((category) => params.append('category', category));
+
+    if (searchQuery.trim()) {
+      params.set('q', searchQuery.trim());
+    }
+
+    const query = params.toString();
+    return query ? `/?${query}` : '/';
+  }, [countryCode, searchQuery, selectedCategoryList]);
+
+  useEffect(() => {
+    if (isDetecting) return;
+
+    window.history.replaceState(null, '', canonicalPath);
+  }, [canonicalPath, isDetecting]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -141,6 +187,11 @@ export default function Home() {
   if (loading || isDetecting) {
     return (
       <div className={SHELL_CLASS}>
+        <SEO
+          title={pageTitle}
+          description={pageDescription}
+          canonicalPath={canonicalPath}
+        />
         <Header
           countries={countries}
           selectedCountry={country}
@@ -160,6 +211,11 @@ export default function Home() {
   if (error) {
     return (
       <div className={SHELL_CLASS}>
+        <SEO
+          title={pageTitle}
+          description={pageDescription}
+          canonicalPath={canonicalPath}
+        />
         <Header
           countries={countries}
           selectedCountry={country}
@@ -178,6 +234,12 @@ export default function Home() {
 
   return (
     <div className={SHELL_CLASS}>
+      <SEO
+        title={pageTitle}
+        description={pageDescription}
+        canonicalPath={canonicalPath}
+        products={filteredProducts}
+      />
       <Header
         countries={countries}
         selectedCountry={country}
