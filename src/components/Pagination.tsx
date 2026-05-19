@@ -50,12 +50,12 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="glass-panel mt-10 flex flex-col items-center justify-between gap-4 rounded-[28px] px-4 py-4 sm:flex-row sm:px-6">
+    <div className="glass-panel mt-10 flex flex-col items-center justify-between gap-4 rounded-[28px] px-4 py-4 sm:flex-row sm:px-6 dark:bg-opacity-50">
       {/* Previous Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-200 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-200 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800/90 dark:text-slate-200 dark:hover:border-teal-600 dark:hover:text-teal-400"
       >
         Previous
       </button>
@@ -65,7 +65,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         {pageNumbers.map((page, index) => {
           if (page === 'ellipsis') {
             return (
-              <span key={`ellipsis-${index}`} className="px-2 text-slate-400">
+              <span key={`ellipsis-${index}`} className="px-2 text-slate-400 dark:text-slate-500">
                 ...
               </span>
             );
@@ -80,8 +80,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
               onClick={() => onPageChange(pageNum)}
               className={`h-10 min-w-10 rounded-full px-3 text-sm font-bold transition ${
                 isActive
-                  ? 'bg-slate-950 text-white shadow-[0_14px_24px_rgba(15,23,42,0.18)]'
-                  : 'border border-slate-200 bg-white/90 text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700'
+                  ? 'bg-slate-950 text-white shadow-[0_14px_24px_rgba(15,23,42,0.18)] dark:bg-slate-800 dark:shadow-[0_14px_24px_rgba(0,0,0,0.3)]'
+                  : 'border border-slate-200 bg-white/90 text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 dark:border-slate-700 dark:bg-slate-800/90 dark:text-slate-200 dark:hover:border-teal-600 dark:hover:bg-slate-700 dark:hover:text-teal-400'
               }`}
             >
               {pageNum}
@@ -94,7 +94,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-200 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-200 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800/90 dark:text-slate-200 dark:hover:border-teal-600 dark:hover:text-teal-400"
       >
         Next
       </button>

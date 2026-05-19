@@ -17,6 +17,24 @@
     --brand: #0f766e;
     --brand-soft: #ccfbf1;
     --accent: #f59e0b;
+    --header-ink: #0f172a;
+    --header-muted: #526072;
+  }
+
+  :root.dark {
+    color-scheme: dark;
+    --bg-top: #0f172a;
+    --bg-bottom: #1a2332;
+    --ink: #f1f5f9;
+    --muted: #cbd5e1;
+    --line: rgba(148, 163, 184, 0.15);
+    --panel: rgba(30, 41, 59, 0.5);
+    --panel-strong: rgba(30, 41, 59, 0.65);
+    --brand: #14b8a6;
+    --brand-soft: #164e63;
+    --accent: #f59e0b;
+    --header-ink: #f1f5f9;
+    --header-muted: #cbd5e1;
   }
 
   * {
@@ -28,6 +46,13 @@
     scroll-behavior: smooth;
     background:
       radial-gradient(circle at top, rgba(125, 211, 252, 0.18), transparent 35%),
+      linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    transition: background-color 0.3s ease, background 0.3s ease;
+  }
+
+  html.dark {
+    background:
+      radial-gradient(circle at top, rgba(45, 212, 191, 0.08), transparent 35%),
       linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   }
 
@@ -43,6 +68,15 @@
       linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: color 0.3s ease, background-color 0.3s ease;
+  }
+
+  body.dark {
+    background:
+      radial-gradient(circle at 10% 20%, rgba(244, 114, 182, 0.04), transparent 28%),
+      radial-gradient(circle at 90% 10%, rgba(45, 212, 191, 0.08), transparent 24%),
+      radial-gradient(circle at 50% 100%, rgba(251, 191, 36, 0.06), transparent 20%),
+      linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   }
 
   h1,
@@ -85,6 +119,15 @@
     linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
     linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px);
   background-size: auto, 72px 72px, 72px 72px;
+  transition: background 0.3s ease;
+}
+
+:root.dark #root::before {
+  background:
+    linear-gradient(rgba(30, 41, 59, 0.4), rgba(30, 41, 59, 0.4)),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+  background-size: auto, 72px 72px, 72px 72px;
 }
 
 #root::after {
@@ -96,6 +139,13 @@
   background:
     radial-gradient(circle at top right, rgba(20, 184, 166, 0.12), transparent 30%),
     radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.1), transparent 24%);
+  transition: background 0.3s ease;
+}
+
+:root.dark #root::after {
+  background:
+    radial-gradient(circle at top right, rgba(20, 184, 166, 0.05), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.05), transparent 24%);
 }
 
 @layer components {
@@ -151,4 +201,57 @@
 
 .float-slow {
   animation: float 8s ease-in-out infinite;
+}
+
+/* Dark mode support for Tailwind classes */
+:root.dark {
+  color-scheme: dark;
+}
+
+:root.dark .text-slate-900 {
+  @apply text-slate-100;
+}
+
+:root.dark .text-slate-700 {
+  @apply text-slate-200;
+}
+
+:root.dark .text-slate-600 {
+  @apply text-slate-300;
+}
+
+:root.dark .text-slate-500 {
+  @apply text-slate-400;
+}
+
+:root.dark .text-slate-950 {
+  @apply text-slate-50;
+}
+
+:root.dark .bg-white {
+  @apply bg-slate-800;
+}
+
+:root.dark .bg-white\/85 {
+  @apply bg-slate-800/85;
+}
+
+:root.dark .bg-white\/90 {
+  @apply bg-slate-800/90;
+}
+
+:root.dark .border-slate-200 {
+  @apply border-slate-700;
+}
+
+:root.dark .border-white {
+  @apply border-slate-700;
+}
+
+:root.dark .border-white\/70 {
+  @apply border-slate-600/70;
+}
+
+:root.dark .border-white\/40 {
+  @apply border-slate-600/40;
 }

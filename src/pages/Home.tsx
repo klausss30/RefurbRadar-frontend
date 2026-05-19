@@ -1,7 +1,8 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { Category } from '../types/product';
 import { useCountry } from '../hooks/useCountry';
 import { useFeed } from '../hooks/useFeed';
+import { useProductFilters } from '../hooks/useProductFilters';
 import { DEFAULT_COUNTRY } from '../config/countries';
 import SEO from '../components/SEO';
 import Header from '../components/Header';
@@ -10,8 +11,6 @@ import SpecFilters from '../components/SpecFilters';
 import ProductGrid from '../components/ProductGrid';
 import Pagination from '../components/Pagination';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
-
-type SortOption = 'newest' | 'price-low' | 'price-high';
 
 const CATEGORY_ORDER: Category[] = [
   'MacBook Air',
@@ -30,7 +29,8 @@ const CATEGORY_ORDER: Category[] = [
   'Other',
 ];
 
-const SHELL_CLASS = 'relative min-h-screen pb-12 text-slate-900';
+const SHELL_CLASS = 'relative min-h-screen pb-12 text-slate-900 dark:text-slate-100';
+const ITEMS_PER_PAGE = 24;
 
 function getInitialCategories(): Set<Category> {
   const params = new URLSearchParams(window.location.search);
@@ -50,18 +50,29 @@ export default function Home() {
   const { countryCode, country, updateCountry, isDetecting, countries } = useCountry();
   const { products, loading, error, lastUpdated, refresh } = useFeed(countryCode, country);
 
-  const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(() => getInitialCategories());
-  const [searchQuery, setSearchQuery] = useState(() => getInitialSearchQuery());
-  const [sortOption, setSortOption] = useState<SortOption>('newest');
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const ITEMS_PER_PAGE = 24;
+  const {
+    selectedCategories,
+    searchQuery,
+    sortOption,
+    currentPage,
+    filteredProducts,
+    paginatedProducts,
+    totalPages,
+    activeFilterCount,
+    handleCategoryToggle,
+    handleSearchChange,
+    handleSortChange,
+    handlePageChange,
+    clearFilters,
+  } = useProductFilters(products, {
+    initialCategories: getInitialCategories(),
+    initialSearchQuery: getInitialSearchQuery(),
+    itemsPerPage: ITEMS_PER_PAGE,
+  });
 
   const handleCountryChange = (newCode: string) => {
     updateCountry(newCode);
-    setSelectedCategories(new Set());
-    setSearchQuery('');
-    setCurrentPage(1);
+    clearFilters();
   };
 
   const availableCategories = useMemo(() => {
@@ -77,43 +88,6 @@ export default function Home() {
     });
   }, [products]);
 
-  const filteredProducts = useMemo(() => {
-    let filtered = [...products];
-
-    if (selectedCategories.size > 0) {
-      filtered = filtered.filter((p) => selectedCategories.has(p.category));
-    }
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((p) => {
-        const titleMatch = p.title.toLowerCase().includes(query);
-        const specsMatch = p.specsText?.toLowerCase().includes(query);
-        return titleMatch || specsMatch;
-      });
-    }
-
-    filtered.sort((a, b) => {
-      switch (sortOption) {
-        case 'newest':
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [products, selectedCategories, searchQuery, sortOption]);
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-  const activeFilterCount = selectedCategories.size + (searchQuery.trim() ? 1 : 0);
   const selectedCategoryList = useMemo(() => Array.from(selectedCategories), [selectedCategories]);
   const primaryCategory = selectedCategoryList[0];
   const pageTitle = primaryCategory
@@ -145,43 +119,13 @@ export default function Home() {
     window.history.replaceState(null, '', canonicalPath);
   }, [canonicalPath, isDetecting]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  // Scroll to top when pagination changes
+  useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCategoryToggle = (category: Category) => {
-    setSelectedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(category)) {
-        next.delete(category);
-      } else {
-        next.add(category);
-      }
-      return next;
-    });
-    setCurrentPage(1);
-  };
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
-
-  const handleSortChange = (option: SortOption) => {
-    setSortOption(option);
-    setCurrentPage(1);
-  };
+  }, [currentPage]);
 
   const handleRetry = () => {
     updateCountry(countryCode);
-  };
-
-  const clearFilters = () => {
-    setSelectedCategories(new Set());
-    setSearchQuery('');
-    setSortOption('newest');
-    setCurrentPage(1);
   };
 
   if (loading || isDetecting) {
@@ -254,7 +198,7 @@ export default function Home() {
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <main className="min-w-0">
-          <div className="glass-panel mb-6 rounded-[30px] p-5 sm:p-6">
+          <div className="glass-panel mb-6 rounded-[30px] p-5 sm:p-6 dark:bg-opacity-50">
             <div className="flex flex-col gap-6">
               <div>
                 <CategoryFilter
@@ -273,11 +217,11 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-wrap gap-3 xl:justify-start">
-                  <div className="rounded-full border border-white/70 bg-white/85 p-1 shadow-[0_12px_24px_rgba(15,23,42,0.06)]">
+                  <div className="rounded-full border border-white/70 bg-white/85 p-1 shadow-[0_12px_24px_rgba(15,23,42,0.06)] dark:border-slate-600/70 dark:bg-slate-800/85">
                     <select
                       value={sortOption}
-                      onChange={(e) => handleSortChange(e.target.value as SortOption)}
-                      className="min-w-[14rem] rounded-full bg-transparent px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none"
+                      onChange={(e) => handleSortChange(e.target.value as any)}
+                      className="min-w-[14rem] rounded-full bg-transparent px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none dark:text-slate-200"
                     >
                       <option value="newest">Newest First</option>
                       <option value="price-low">Price: Low to High</option>
@@ -291,7 +235,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={clearFilters}
-                      className="rounded-full border border-slate-200 bg-white/90 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                      className="rounded-full border border-slate-200 bg-white/90 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 dark:border-slate-700 dark:bg-slate-800/90 dark:text-slate-200 dark:hover:border-rose-800 dark:hover:bg-slate-800 dark:hover:text-rose-400"
                     >
                       Clear filters
                     </button>

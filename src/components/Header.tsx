@@ -1,4 +1,5 @@
 import CountrySelect from "./CountrySelect";
+import ThemeToggle from "./ThemeToggle";
 import type { Country as CountryConfig } from "../config/countries";
 import { formatRelativeTime } from "../utils/format";
 import logo from "../assets/logo.PNG";
@@ -62,7 +63,7 @@ export default function Header({
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
                 <div className="min-w-0">
                   <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500">
                     Country or Region
@@ -90,12 +91,16 @@ export default function Header({
                   </div>
                 </div>
 
+                <div className="flex justify-center">
+                  <ThemeToggle />
+                </div>
+
                 {onRefresh && (
                   <div className="flex flex-col justify-center gap-2 items-start">
                     <button
                       onClick={onRefresh}
                       disabled={isLoading || isDetecting}
-                      className="flex min-h-[3rem] items-center justify-center gap-2 rounded-[18px] bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(15,23,42,0.16)] transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex min-h-[3rem] items-center justify-center gap-2 rounded-[18px] bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(15,23,42,0.16)] transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 dark:hover:bg-slate-700"
                       title="Refresh cache data"
                     >
                       <svg
