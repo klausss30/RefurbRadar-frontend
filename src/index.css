@@ -23,18 +23,18 @@
 
   :root.dark {
     color-scheme: dark;
-    --bg-top: #0f172a;
-    --bg-bottom: #1a2332;
-    --ink: #f1f5f9;
-    --muted: #cbd5e1;
-    --line: rgba(148, 163, 184, 0.15);
-    --panel: rgba(30, 41, 59, 0.5);
-    --panel-strong: rgba(30, 41, 59, 0.65);
-    --brand: #14b8a6;
-    --brand-soft: #164e63;
-    --accent: #f59e0b;
-    --header-ink: #f1f5f9;
-    --header-muted: #cbd5e1;
+    --bg-top: #1a1f2e;
+    --bg-bottom: #242d3a;
+    --ink: #e8eaed;
+    --muted: #b0b4bc;
+    --line: rgba(176, 180, 188, 0.12);
+    --panel: rgba(45, 52, 65, 0.6);
+    --panel-strong: rgba(45, 52, 65, 0.8);
+    --brand: #20d9a3;
+    --brand-soft: #1d5f4d;
+    --accent: #fca311;
+    --header-ink: #e8eaed;
+    --header-muted: #b0b4bc;
   }
 
   * {
@@ -52,7 +52,8 @@
 
   html.dark {
     background:
-      radial-gradient(circle at top, rgba(45, 212, 191, 0.08), transparent 35%),
+      radial-gradient(circle at top right, rgba(32, 217, 163, 0.06), transparent 40%),
+      radial-gradient(circle at bottom left, rgba(252, 163, 17, 0.04), transparent 35%),
       linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   }
 
@@ -73,9 +74,9 @@
 
   body.dark {
     background:
-      radial-gradient(circle at 10% 20%, rgba(244, 114, 182, 0.04), transparent 28%),
-      radial-gradient(circle at 90% 10%, rgba(45, 212, 191, 0.08), transparent 24%),
-      radial-gradient(circle at 50% 100%, rgba(251, 191, 36, 0.06), transparent 20%),
+      radial-gradient(circle at 10% 20%, rgba(244, 114, 182, 0.02), transparent 30%),
+      radial-gradient(circle at 90% 10%, rgba(32, 217, 163, 0.04), transparent 28%),
+      radial-gradient(circle at 50% 100%, rgba(252, 163, 17, 0.03), transparent 25%),
       linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   }
 
@@ -124,9 +125,9 @@
 
 :root.dark #root::before {
   background:
-    linear-gradient(rgba(30, 41, 59, 0.4), rgba(30, 41, 59, 0.4)),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
-    linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(36, 45, 58, 0.3), rgba(36, 45, 58, 0.3)),
+    linear-gradient(90deg, rgba(176, 180, 188, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(176, 180, 188, 0.03) 1px, transparent 1px);
   background-size: auto, 72px 72px, 72px 72px;
 }
 
@@ -137,15 +138,15 @@
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(circle at top right, rgba(20, 184, 166, 0.12), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.1), transparent 24%);
+    radial-gradient(circle at top right, rgba(32, 217, 163, 0.08), transparent 35%),
+    radial-gradient(circle at bottom left, rgba(252, 163, 17, 0.06), transparent 28%);
   transition: background 0.3s ease;
 }
 
 :root.dark #root::after {
   background:
-    radial-gradient(circle at top right, rgba(20, 184, 166, 0.05), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.05), transparent 24%);
+    radial-gradient(circle at top right, rgba(32, 217, 163, 0.03), transparent 35%),
+    radial-gradient(circle at bottom left, rgba(252, 163, 17, 0.02), transparent 28%);
 }
 
 @layer components {
@@ -254,4 +255,17 @@
 
 :root.dark .border-white\/40 {
   @apply border-slate-600/40;
+}
+
+/* Select option styling for dark mode */
+:root.dark select option {
+  background-color: #2d3441;
+  color: #e8eaed;
+}
+
+/* Focus and active styles for form inputs */
+:root.dark input:focus,
+:root.dark select:focus,
+:root.dark textarea:focus {
+  outline: none;
 }

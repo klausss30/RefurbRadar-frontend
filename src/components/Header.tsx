@@ -35,14 +35,19 @@ export default function Header({
     <header className="px-4 pt-4 sm:px-6 lg:px-8 lg:pt-6">
       <div className="mx-auto max-w-7xl">
         <div className="glass-panel relative overflow-hidden rounded-[36px] px-5 py-6 sm:px-8 sm:py-7">
-          <div className="float-slow absolute -right-10 -top-16 h-40 w-40 rounded-full bg-cyan-200/50 blur-3xl" />
-          <div className="absolute bottom-0 left-1/4 h-28 w-28 rounded-full bg-amber-200/40 blur-3xl" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+          <div className="float-slow absolute -right-10 -top-16 h-40 w-40 rounded-full bg-cyan-200/50 blur-3xl dark:bg-emerald-500/20" />
+          <div className="absolute bottom-0 left-1/4 h-28 w-28 rounded-full bg-amber-200/40 blur-3xl dark:bg-orange-500/20" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-slate-700/80" />
 
           <div className="relative">
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-center">
+            {/* Top right - Theme Toggle */}
+            <div className="absolute right-6 top-6 sm:right-8 sm:top-7">
+              <ThemeToggle />
+            </div>
+
+            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-center pr-16 sm:pr-20">
               <div className="flex items-center gap-4 sm:gap-5">
-                <div className="rounded-[28px] border border-white/70 bg-white/85 p-3 shadow-[0_20px_40px_rgba(15,23,42,0.08)]">
+                <div className="rounded-[28px] border border-white/70 bg-white/85 p-3 shadow-[0_20px_40px_rgba(15,23,42,0.08)] dark:border-slate-600/60 dark:bg-slate-700/70">
                   <img
                     src={logo}
                     alt="RefurbRadar Logo"
@@ -51,21 +56,21 @@ export default function Header({
                 </div>
 
                 <div className="min-w-0">
-                  <div className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-500">
+                  <div className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
                     Apple Refurb Tracker
                   </div>
-                  <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-[2.6rem]">
+                  <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-50 sm:text-[2.6rem]">
                     RefurbRadar
                   </h1>
-                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
                     Apple refurbished inventory by region.
                   </p>
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                 <div className="min-w-0">
-                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500">
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
                     Country or Region
                   </label>
                   <div className="relative">
@@ -76,7 +81,7 @@ export default function Header({
                       disabled={isDetecting}
                     />
                     <svg
-                      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -91,16 +96,12 @@ export default function Header({
                   </div>
                 </div>
 
-                <div className="flex justify-center">
-                  <ThemeToggle />
-                </div>
-
                 {onRefresh && (
                   <div className="flex flex-col justify-center gap-2 items-start">
                     <button
                       onClick={onRefresh}
                       disabled={isLoading || isDetecting}
-                      className="flex min-h-[3rem] items-center justify-center gap-2 rounded-[18px] bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(15,23,42,0.16)] transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 dark:hover:bg-slate-700"
+                      className="flex min-h-[3rem] items-center justify-center gap-2 rounded-[18px] bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(15,23,42,0.16)] transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-700 dark:hover:bg-slate-600 dark:shadow-[0_14px_28px_rgba(0,0,0,0.3)]"
                       title="Refresh cache data"
                     >
                       <svg
@@ -118,7 +119,7 @@ export default function Header({
                       </svg>
                       {isLoading ? "Refreshing" : "Refresh"}
                     </button>
-                    <div className="px-1 text-left text-xs font-medium text-slate-500">
+                    <div className="px-1 text-left text-xs font-medium text-slate-500 dark:text-slate-400">
                       {freshnessLabel}
                     </div>
                   </div>
@@ -126,15 +127,15 @@ export default function Header({
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-white/40 pt-3">
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-white/40 dark:border-slate-600/40 pt-3">
               {activeFilterCount > 0 && (
-                <span className="rounded-full border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700">
+                <span className="rounded-full border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
                   {activeFilterCount} active filter
                   {activeFilterCount === 1 ? "" : "s"}
                 </span>
               )}
               {searchQuery.trim() && (
-                <span className="rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700">
+                <span className="rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 dark:border-orange-900/50 dark:bg-orange-950/40 dark:text-orange-300">
                   {searchQuery.trim()}
                 </span>
               )}
