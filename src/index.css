@@ -58,8 +58,8 @@
 
   html.dark {
     background:
-      radial-gradient(circle at top right, rgba(32, 217, 163, 0.06), transparent 40%),
-      radial-gradient(circle at bottom left, rgba(252, 163, 17, 0.04), transparent 35%),
+      radial-gradient(circle at top right, rgba(100, 210, 255, 0.09), transparent 40%),
+      radial-gradient(circle at bottom left, rgba(191, 90, 242, 0.07), transparent 35%),
       linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   }
 
@@ -78,7 +78,7 @@
     transition: color 0.3s ease, background-color 0.3s ease;
   }
 
-  body.dark {
+  :root.dark body {
     background:
       radial-gradient(circle at 8% 12%, rgba(191, 90, 242, 0.13), transparent 32%),
       radial-gradient(circle at 92% 8%, rgba(100, 210, 255, 0.12), transparent 30%),
@@ -151,8 +151,8 @@
 
 :root.dark #root::after {
   background:
-    radial-gradient(circle at top right, rgba(32, 217, 163, 0.03), transparent 35%),
-    radial-gradient(circle at bottom left, rgba(252, 163, 17, 0.02), transparent 28%);
+    radial-gradient(circle at top right, rgba(100, 210, 255, 0.07), transparent 35%),
+    radial-gradient(circle at bottom left, rgba(191, 90, 242, 0.05), transparent 28%);
 }
 
 @layer components {
@@ -227,59 +227,6 @@
 
 .float-slow {
   animation: float 8s ease-in-out infinite;
-}
-
-/* Dark mode support for Tailwind classes */
-:root.dark {
-  color-scheme: dark;
-}
-
-:root.dark .text-slate-900 {
-  @apply text-slate-100;
-}
-
-:root.dark .text-slate-700 {
-  @apply text-slate-200;
-}
-
-:root.dark .text-slate-600 {
-  @apply text-slate-300;
-}
-
-:root.dark .text-slate-500 {
-  @apply text-slate-400;
-}
-
-:root.dark .text-slate-950 {
-  @apply text-slate-50;
-}
-
-:root.dark .bg-white {
-  @apply bg-slate-800;
-}
-
-:root.dark .bg-white\/85 {
-  @apply bg-slate-800/85;
-}
-
-:root.dark .bg-white\/90 {
-  @apply bg-slate-800/90;
-}
-
-:root.dark .border-slate-200 {
-  @apply border-slate-700;
-}
-
-:root.dark .border-white {
-  @apply border-slate-700;
-}
-
-:root.dark .border-white\/70 {
-  @apply border-slate-600/70;
-}
-
-:root.dark .border-white\/40 {
-  @apply border-slate-600/40;
 }
 
 /* Select option styling for dark mode */

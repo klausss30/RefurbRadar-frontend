@@ -9,7 +9,7 @@ export default function SpecFilters({
 }: SpecFiltersProps) {
   return (
     <div>
-      <label className="mb-2 block text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
+      <label className="mb-2 block text-xs font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
         Search
       </label>
       <div className="relative">

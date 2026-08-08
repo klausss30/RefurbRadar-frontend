@@ -48,7 +48,7 @@ export default function CategoryFilter({
         <button
           type="button"
           onClick={toggleCollapse}
-          className="mb-4 flex w-full items-center justify-between rounded-2xl border border-white/60 bg-white/70 px-4 py-3 text-left text-sm font-semibold text-slate-900 shadow-[0_12px_24px_rgba(15,23,42,0.05)] transition hover:border-teal-200 hover:text-slate-700 focus:outline-none"
+          className="mb-4 flex w-full items-center justify-between rounded-2xl border border-white/60 bg-white/70 px-4 py-3 text-left text-sm font-semibold text-slate-900 shadow-[0_12px_24px_rgba(15,23,42,0.05)] transition hover:border-blue-200 hover:text-slate-700 focus:outline-none dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100 dark:hover:border-sky-400/30 dark:hover:bg-slate-800/60 dark:hover:text-slate-50"
           aria-expanded={!isCollapsed}
         >
           <span className="flex items-center gap-3">
@@ -56,7 +56,7 @@ export default function CategoryFilter({
               Category
             </span>
             {selectedCount > 0 && (
-              <span className="rounded-full bg-teal-100 px-2.5 py-1 text-[11px] font-bold text-teal-700">
+              <span className="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-bold text-blue-700 dark:bg-sky-400/15 dark:text-sky-200">
                 {selectedCount} selected
               </span>
             )}
@@ -83,7 +83,7 @@ export default function CategoryFilter({
             Category
           </h3>
           {selectedCount > 0 && (
-            <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white">
+            <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white dark:bg-white/15 dark:text-slate-100">
               {selectedCount}
             </span>
           )}
