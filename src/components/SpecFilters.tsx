@@ -31,7 +31,7 @@ export default function SpecFilters({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search products, chips, storage..."
-          className="w-full rounded-2xl border border-white/70 bg-white/85 py-3 pl-11 pr-4 text-sm text-slate-800 shadow-[0_12px_24px_rgba(15,23,42,0.06)] outline-none transition duration-200 placeholder:text-slate-400 focus:border-teal-300 focus:ring-4 focus:ring-teal-100"
+          className="w-full rounded-2xl border border-white/70 bg-white/70 py-3 pl-11 pr-4 text-sm text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_12px_30px_rgba(43,69,101,0.08)] outline-none backdrop-blur-xl transition duration-200 placeholder:text-slate-400 focus:border-blue-300 focus:bg-white/85 focus:ring-4 focus:ring-blue-100/70 dark:border-white/10 dark:bg-slate-900/45 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-sky-400/50 dark:focus:bg-slate-900/65 dark:focus:ring-sky-400/10"
         />
       </div>
     </div>

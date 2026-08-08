@@ -28,6 +28,7 @@ export type Country =
 export type Category =
   | "iPad"
   | "iPhone"
+  | "MacBook Neo"
   | "MacBook Air"
   | "MacBook Pro"
   | "iMac"

@@ -15,6 +15,7 @@ const COUNTRIES = [
   'sg', 'kr', 'cx', 'ch', 'tw', 'uk', 'us',
 ];
 const CATEGORIES = [
+  'MacBook Neo',
   'MacBook Air',
   'MacBook Pro',
   'iMac',

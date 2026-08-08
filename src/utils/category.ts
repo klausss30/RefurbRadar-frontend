@@ -40,8 +40,10 @@ export function detectCategory(title: string): Category {
   // iPhone
   if (/\biphone\b/.test(normalized)) return "iPhone";
 
-  // MacBook variants (must check "air" and "pro" before general "macbook")
+  // MacBook variants (must check named models before general "macbook")
   // Also check for "macbook" as one word or "mac book" separated
+  if (normalized.includes("macbook neo") || normalized.includes("mac book neo"))
+    return "MacBook Neo";
   if (normalized.includes("macbook air") || normalized.includes("mac book air"))
     return "MacBook Air";
   if (normalized.includes("macbook pro") || normalized.includes("mac book pro"))

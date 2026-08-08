@@ -35,9 +35,9 @@ export default function Header({
     <header className="px-4 pt-4 sm:px-6 lg:px-8 lg:pt-6">
       <div className="mx-auto max-w-7xl">
         <div className="glass-panel relative overflow-hidden rounded-[36px] px-5 py-6 sm:px-8 sm:py-7">
-          <div className="float-slow absolute -right-10 -top-16 h-40 w-40 rounded-full bg-cyan-200/50 blur-3xl dark:bg-emerald-500/20" />
-          <div className="absolute bottom-0 left-1/4 h-28 w-28 rounded-full bg-amber-200/40 blur-3xl dark:bg-orange-500/20" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-slate-700/80" />
+          <div className="float-slow absolute -right-10 -top-16 h-44 w-44 rounded-full bg-sky-300/45 blur-3xl dark:bg-sky-400/15" />
+          <div className="absolute bottom-0 left-1/4 h-32 w-32 rounded-full bg-violet-300/30 blur-3xl dark:bg-violet-500/15" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent dark:via-white/20" />
 
           <div className="relative">
             {/* Top right - Theme Toggle */}
@@ -47,7 +47,7 @@ export default function Header({
 
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-center pr-16 sm:pr-20">
               <div className="flex items-center gap-4 sm:gap-5">
-                <div className="rounded-[28px] border border-white/70 bg-white/85 p-3 shadow-[0_20px_40px_rgba(15,23,42,0.08)] dark:border-slate-600/60 dark:bg-slate-700/70">
+                <div className="rounded-[28px] border border-white/80 bg-white/55 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_20px_40px_rgba(43,69,101,0.1)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/40 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_20px_40px_rgba(0,0,0,0.3)]">
                   <img
                     src={logo}
                     alt="RefurbRadar Logo"
@@ -101,7 +101,7 @@ export default function Header({
                     <button
                       onClick={onRefresh}
                       disabled={isLoading || isDetecting}
-                      className="flex min-h-[3rem] items-center justify-center gap-2 rounded-[18px] bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(15,23,42,0.16)] transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-700 dark:hover:bg-slate-600 dark:shadow-[0_14px_28px_rgba(0,0,0,0.3)]"
+                      className="flex min-h-[3rem] items-center justify-center gap-2 rounded-[18px] border border-white/20 bg-slate-950/90 px-4 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_14px_28px_rgba(15,23,42,0.18)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white/10 dark:hover:bg-sky-400/25 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_14px_28px_rgba(0,0,0,0.3)]"
                       title="Refresh cache data"
                     >
                       <svg

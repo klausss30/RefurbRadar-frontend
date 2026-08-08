@@ -12,6 +12,7 @@ interface CategoryFilterProps {
 const CATEGORY_LABELS: Record<Category, string> = {
   'iPad': 'iPad',
   'iPhone': 'iPhone',
+  'MacBook Neo': 'MacBook Neo',
   'MacBook Air': 'MacBook Air',
   'MacBook Pro': 'MacBook Pro',
   'iMac': 'iMac',
@@ -102,8 +103,8 @@ export default function CategoryFilter({
             aria-pressed={selectedCategories.has(category)}
             className={`rounded-full border px-3 py-2 text-sm font-semibold transition duration-200 ${
               selectedCategories.has(category)
-                ? 'border-teal-500 bg-teal-500 text-white shadow-[0_12px_24px_rgba(13,148,136,0.22)]'
-                : 'border-slate-200 bg-white/80 text-slate-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700'
+                ? 'border-blue-500/70 bg-blue-500/90 text-white shadow-[0_10px_26px_rgba(0,122,255,0.25)] dark:border-sky-300/30 dark:bg-sky-400/20 dark:text-sky-100 dark:shadow-[0_10px_28px_rgba(0,0,0,0.28)]'
+                : 'border-white/70 bg-white/55 text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl hover:border-blue-200 hover:bg-white/85 hover:text-blue-700 dark:border-white/10 dark:bg-slate-900/35 dark:text-slate-300 dark:hover:border-sky-400/30 dark:hover:bg-slate-800/70 dark:hover:text-sky-200'
             }`}
           >
             {CATEGORY_LABELS[category]}

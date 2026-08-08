@@ -13,6 +13,7 @@ import Pagination from '../components/Pagination';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 
 const CATEGORY_ORDER: Category[] = [
+  'MacBook Neo',
   'MacBook Air',
   'MacBook Pro',
   'iMac',
@@ -198,7 +199,7 @@ export default function Home() {
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <main className="min-w-0">
-          <div className="glass-panel mb-6 rounded-[30px] p-5 sm:p-6 dark:bg-opacity-50">
+          <div className="glass-panel mb-6 rounded-[30px] p-5 sm:p-6">
             <div className="flex flex-col gap-6">
               <div>
                 <CategoryFilter

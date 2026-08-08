@@ -131,6 +131,11 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=au&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=au&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -192,6 +197,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=au&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=bx&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -261,6 +271,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=be&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=be&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -322,6 +337,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=be&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=ca&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -391,6 +411,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=xf&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=xf&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -452,6 +477,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=xf&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=cn&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -521,6 +551,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=de&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=de&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -582,6 +617,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=de&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=es&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -651,6 +691,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=fr&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=fr&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -712,6 +757,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=fr&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=hk&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -781,6 +831,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=hz&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=hz&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -842,6 +897,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=hz&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=ie&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -911,6 +971,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=it&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=it&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -972,6 +1037,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=it&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=jp&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1041,6 +1111,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=nl&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=nl&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -1102,6 +1177,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=nl&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=nz&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1171,6 +1251,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=at&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=at&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -1232,6 +1317,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=at&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=pl&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1301,6 +1391,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=sg&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=sg&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -1362,6 +1457,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=sg&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=kr&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1431,6 +1531,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=cx&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=cx&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -1492,6 +1597,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=cx&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=ch&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1561,6 +1671,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=tw&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=tw&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -1626,6 +1741,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://refurbradar.com/?country=uk&amp;category=MacBook%20Neo</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://refurbradar.com/?country=uk&amp;category=MacBook%20Air</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
@@ -1687,6 +1807,11 @@
   </url>
   <url>
     <loc>https://refurbradar.com/?country=uk&amp;category=Accessories</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://refurbradar.com/?country=us&amp;category=MacBook%20Neo</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
