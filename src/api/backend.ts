@@ -75,7 +75,7 @@ export async function fetchFeaturedListings(
 ): Promise<FeaturedListingsResponse> {
   const params = new URLSearchParams({
     market: marketCode,
-    limit: '3',
+    limit: '4',
   });
 
   return fetchJson<FeaturedListingsResponse>(`/api/listings/featured?${params}`, signal);

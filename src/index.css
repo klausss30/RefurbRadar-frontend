@@ -286,6 +286,36 @@
   -webkit-text-stroke: 1.5px var(--punk-ink);
 }
 
+.nothing-theme .punk-hero-title {
+  display: flex;
+  max-width: 62rem;
+  flex-direction: column;
+  gap: 0.08em;
+}
+
+.nothing-theme .punk-hero-title .punk-hero-eyebrow {
+  margin-bottom: 0.45rem;
+  color: var(--punk-ink);
+  font-size: clamp(0.78rem, 1.4vw, 1.1rem);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+  -webkit-text-stroke: 0;
+}
+
+.nothing-theme .punk-hero-title .punk-hero-primary {
+  color: var(--punk-ink);
+  font-size: clamp(2.35rem, 7.2vw, 6.4rem);
+  line-height: 0.88;
+  -webkit-text-stroke: 0;
+}
+
+.nothing-theme .punk-hero-title .punk-hero-secondary {
+  font-size: clamp(1.85rem, 5.4vw, 4.8rem);
+  line-height: 0.92;
+}
+
 .nothing-theme .punk-meta {
   width: fit-content;
   border: 1px solid var(--punk-ink);
@@ -416,7 +446,11 @@
   }
 
   .nothing-theme .punk-display {
-    max-width: 82%;
+    max-width: 86%;
     letter-spacing: -0.055em;
+  }
+
+  .nothing-theme .punk-hero-title .punk-hero-eyebrow {
+    margin-bottom: 0.2rem;
   }
 }

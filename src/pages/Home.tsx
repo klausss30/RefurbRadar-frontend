@@ -10,6 +10,7 @@ import { getProductGroup, PRODUCT_GROUPS, type ProductGroup } from '../config/pr
 import { formatDate } from '../utils/format';
 import SEO from '../components/SEO';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 import ProductSection from '../components/ProductSection';
 import CategoryFilter from '../components/CategoryFilter';
 import SpecFilters from '../components/SpecFilters';
@@ -65,16 +66,18 @@ function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt
         products={featuredProducts}
       />
 
-      <section className="punk-hero border-b px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+      <section className="punk-hero border-b px-4 py-8 sm:px-6 sm:py-20 lg:px-8">
         <div className="relative z-10 mx-auto max-w-7xl">
-          <h1 className="punk-display text-5xl sm:text-7xl lg:text-[6.4rem]">
-            Apple Store <span>Refurbished</span><br /><span>Devices Inventory Tracker</span>
+          <h1 className="punk-display punk-hero-title">
+            <span className="punk-hero-eyebrow">Apple Store</span>
+            <span className="punk-hero-primary">Refurbished Devices</span>
+            <span className="punk-hero-secondary">Inventory Tracker</span>
           </h1>
-          <div className="punk-meta mt-8 flex flex-wrap gap-x-6 gap-y-2 px-4 py-3 text-[11px] font-bold">
+          <div className="punk-meta mt-5 flex flex-wrap gap-x-6 gap-y-2 px-3 py-2.5 text-[10px] font-bold sm:mt-8 sm:px-4 sm:py-3 sm:text-[11px]">
             <span>{totalProducts} products available</span>
             {lastReplenishedAt && <span>Latest listing: {formatDate(lastReplenishedAt.toISOString())}</span>}
           </div>
-          <p className="mt-5 max-w-2xl text-xs leading-5 text-neutral-600">
+          <p className="mt-3 max-w-2xl text-[11px] leading-4 text-neutral-600 sm:mt-5 sm:text-xs sm:leading-5">
             RefurbRadar does not sell these products. Availability and pricing are sourced from the Apple Refurbished Store; browse what is available here, then continue to Apple Store to purchase.
           </p>
         </div>
@@ -151,8 +154,7 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
         </button>
 
         <div className="mt-8 border-b border-black pb-9">
-          <p className="punk-kicker">{country.label}</p>
-          <h1 className="punk-display mt-4 text-5xl sm:text-7xl">
+          <h1 className="punk-display text-5xl sm:text-7xl">
             Refurbished {group.label}
           </h1>
           <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">{groupProducts.length} products available</p>
@@ -284,7 +286,7 @@ export default function Home() {
   };
 
   return (
-    <div className="nothing-theme min-h-screen">
+    <div className="nothing-theme flex min-h-screen flex-col">
       <Header
         countries={countries}
         productGroups={inventoryLoading ? [] : availableGroups}
@@ -296,27 +298,30 @@ export default function Home() {
         isDetecting={isDetecting}
       />
 
-      {inventoryLoading || isDetecting ? (
-        <div className="px-4 py-24"><LoadingState message={`Loading ${country.label} inventory…`} /></div>
-      ) : error ? (
-        <div className="px-4 py-24"><ErrorState message={error} onRetry={retryFeatured} /></div>
-      ) : activeGroup ? (
-        groupInventoryLoading ? (
-          <div className="px-4 py-24"><LoadingState message={`Loading all ${activeGroup.label} products in ${country.label}…`} /></div>
-        ) : groupError ? (
-          <div className="px-4 py-24"><ErrorState message={groupError} onRetry={retryGroup} /></div>
+      <div className="flex-1">
+        {inventoryLoading || isDetecting ? (
+          <div className="px-4 py-24"><LoadingState message={`Loading ${country.label} inventory…`} /></div>
+        ) : error ? (
+          <div className="px-4 py-24"><ErrorState message={error} onRetry={retryFeatured} /></div>
+        ) : activeGroup ? (
+          groupInventoryLoading ? (
+            <div className="px-4 py-24"><LoadingState message={`Loading all ${activeGroup.label} products in ${country.label}…`} /></div>
+          ) : groupError ? (
+            <div className="px-4 py-24"><ErrorState message={groupError} onRetry={retryGroup} /></div>
+          ) : (
+            <CatalogPage key={activeGroup.slug} group={activeGroup} products={groupProducts} country={country} onBack={navigateHome} />
+          )
         ) : (
-          <CatalogPage key={activeGroup.slug} group={activeGroup} products={groupProducts} country={country} onBack={navigateHome} />
-        )
-      ) : (
-        <LandingPage
-          featuredGroups={currentFeaturedGroups}
-          totalProducts={totalProducts}
-          country={country}
-          lastReplenishedAt={lastReplenishedAt}
-          onViewAll={navigateGroup}
-        />
-      )}
+          <LandingPage
+            featuredGroups={currentFeaturedGroups}
+            totalProducts={totalProducts}
+            country={country}
+            lastReplenishedAt={lastReplenishedAt}
+            onViewAll={navigateGroup}
+          />
+        )}
+      </div>
+      <Footer />
     </div>
   );
 }
