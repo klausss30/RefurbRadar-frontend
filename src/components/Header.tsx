@@ -41,11 +41,7 @@ export default function Header({
           className="flex shrink-0 items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#ff3028]"
           aria-label="RefurbRadar home"
         >
-          <span className="relative">
-            <img src={logo} alt="" className="h-8 w-8 grayscale contrast-200 object-contain" />
-            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#ff3028]" />
-          </span>
-          <span className="hidden text-xs font-black uppercase tracking-[0.14em] text-black xl:inline">R/R</span>
+          <img src={logo} alt="" className="h-8 w-8 grayscale contrast-200 object-contain" />
         </button>
 
         <nav className="hidden items-center justify-center lg:flex" aria-label="Product categories">
