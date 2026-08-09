@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { Product } from '../types/product';
-import ProductCard from './ProductCard';
+import CompactProductCard from './CompactProductCard';
 import { preloadImages } from '../hooks/useImageCache';
 
 interface ProductGridProps {
@@ -23,14 +23,14 @@ export default function ProductGrid({ products }: ProductGridProps) {
   }, [products]);
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <div className="grid grid-cols-1 justify-items-start gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
       {products.map((product, index) => (
         <div
           key={product.id}
-          className="fade-up h-full"
+          className="fade-up flex h-full w-full max-w-[260px]"
           style={{ animationDelay: `${index * 45}ms` }}
         >
-          <ProductCard product={product} />
+          <CompactProductCard product={product} />
         </div>
       ))}
     </div>
