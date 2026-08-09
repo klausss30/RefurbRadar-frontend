@@ -3,6 +3,7 @@ import type { Category } from '../types/product';
 import { useCountry } from '../hooks/useCountry';
 import { useFeed } from '../hooks/useFeed';
 import { useProductFilters } from '../hooks/useProductFilters';
+import type { SortOption } from '../hooks/useProductFilters';
 import { DEFAULT_COUNTRY } from '../config/countries';
 import SEO from '../components/SEO';
 import Header from '../components/Header';
@@ -221,7 +222,7 @@ export default function Home() {
                   <div className="rounded-full border border-white/70 bg-white/85 p-1 shadow-[0_12px_24px_rgba(15,23,42,0.06)] dark:border-slate-600/70 dark:bg-slate-800/85">
                     <select
                       value={sortOption}
-                      onChange={(e) => handleSortChange(e.target.value as any)}
+                      onChange={(e) => handleSortChange(e.target.value as SortOption)}
                       className="min-w-[14rem] rounded-full bg-transparent px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none dark:text-slate-200"
                     >
                       <option value="newest">Newest First</option>

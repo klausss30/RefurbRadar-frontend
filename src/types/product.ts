@@ -60,15 +60,15 @@ export type Currency =
   | "USD";
 
 export interface Product {
-  id: string; // stable hash: title + pubDate + link
+  id: string; // RSS entry id
   country: Country;
-  rawTitle: string;
-  title: string; // cleaned display title
+  title: string;
   category: Category;
   price: number;
   currency: Currency;
-  publishedAt: string; // ISO string
-  link: string; // Apple Store product link
+  currencySymbol: string;
+  publishedAt: string; // RSS replenishment timestamp
+  link: string;
   imageUrl?: string;
   sku?: string;
 
@@ -80,5 +80,5 @@ export interface Product {
   network?: "Wi-Fi" | "Cellular";
   color?: string;
 
-  specsText?: string; // plain text specs summary
+  specsText?: string; // normalized plain-text RSS description
 }

@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import type { Product, Category } from '../types/product';
 
-type SortOption = 'newest' | 'price-low' | 'price-high';
+export type SortOption = 'newest' | 'price-low' | 'price-high';
 
 interface UseProductFiltersOptions {
   initialCategories?: Set<Category>;

@@ -91,7 +91,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             Price
           </div>
           <div className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">
-            {formatPrice(product.price, product.currency, getLocale(product.country))}
+            {formatPrice(
+              product.price,
+              product.currency,
+              getLocale(product.country),
+              product.currencySymbol,
+            )}
           </div>
         </div>
 

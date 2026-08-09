@@ -1,16 +1,24 @@
 /**
  * Formats price with currency symbol based on country locale
  */
-export function formatPrice(price: number, currency: string, locale?: string): string {
+export function formatPrice(
+  price: number,
+  currency: string,
+  locale?: string,
+  currencySymbol?: string,
+): string {
   // If locale is provided, use it; otherwise try to infer from currency
   const formatLocale = locale || getLocaleFromCurrency(currency);
   
-  const formatted = new Intl.NumberFormat(formatLocale, {
+  const formatter = new Intl.NumberFormat(formatLocale, {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: currency === 'JPY' || currency === 'KRW' ? 0 : 2,
     maximumFractionDigits: currency === 'JPY' || currency === 'KRW' ? 0 : 2,
-  }).format(price);
+  });
+  const formatted = formatter.formatToParts(price)
+    .map((part) => part.type === 'currency' && currencySymbol ? currencySymbol : part.value)
+    .join('');
   
   // Replace apostrophe/quotation mark characters with space (for Swiss format: 2'039.00 -> 2 039.00)
   // Support both ASCII apostrophe (U+0027) and Unicode right single quotation mark (U+2019)
@@ -106,4 +114,3 @@ export function createHash(...strings: string[]): string {
   }
   return Math.abs(hash).toString(36);
 }
-
