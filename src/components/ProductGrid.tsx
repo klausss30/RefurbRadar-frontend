@@ -27,7 +27,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
       {products.map((product, index) => (
         <div
           key={product.id}
-          className="fade-up"
+          className="fade-up h-full"
           style={{ animationDelay: `${index * 45}ms` }}
         >
           <ProductCard product={product} />

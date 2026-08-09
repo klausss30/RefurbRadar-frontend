@@ -80,7 +80,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <div className="mb-3 min-h-[3.75rem]">
+        <div className="mb-3 min-h-[6.5rem]">
           <h3 className="text-lg font-semibold leading-tight text-slate-950 dark:text-slate-50">
             {product.title}
           </h3>
@@ -126,12 +126,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        <div className="mt-4 flex items-center justify-end border-t border-slate-200/70 pt-3 dark:border-slate-700/70">
+        <div className="mt-auto flex items-center justify-end border-t border-slate-200/70 pt-3 dark:border-slate-700/70">
           <a
             href={product.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="punk-action inline-flex items-center gap-2 px-3 py-2 text-[11px] font-black transition"
+            className="punk-action inline-flex w-full items-center justify-center gap-2 px-3 py-2 text-[11px] font-black transition"
           >
             View on Apple Store
             <svg
