@@ -16,7 +16,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <article className="punk-card soft-card group flex h-full flex-col overflow-hidden transition duration-300">
-      <div className="punk-media relative overflow-hidden border-b p-5">
+      <div className="punk-media relative overflow-hidden border-b p-4">
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.2),transparent_65%)] dark:bg-[linear-gradient(135deg,rgba(0,0,0,0.2),transparent_65%)]" />
         <div className="relative flex items-center justify-between gap-3">
           <span className="punk-chip px-3 py-1 text-[11px] font-bold uppercase">
@@ -27,7 +27,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        <div className="relative mt-5 flex h-48 items-center justify-center overflow-hidden border border-black bg-[#f7f6f0] sm:h-56 lg:aspect-[4/3] lg:h-auto">
+        <div className="relative mt-4 flex h-40 items-center justify-center overflow-hidden border border-black bg-[#f7f6f0] sm:h-48 lg:aspect-[4/3] lg:h-auto">
           {product.imageUrl && imageStatus === 'loaded' ? (
             <>
               <img
@@ -79,18 +79,18 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-4 min-h-[4.5rem]">
-          <h3 className="text-xl font-semibold leading-tight text-slate-950 dark:text-slate-50">
+      <div className="flex flex-1 flex-col p-4">
+        <div className="mb-3 min-h-[3.75rem]">
+          <h3 className="text-lg font-semibold leading-tight text-slate-950 dark:text-slate-50">
             {product.title}
           </h3>
         </div>
 
-        <div className="mb-5 border border-black bg-[#e7e6df] p-4">
+        <div className="mb-4 border border-black bg-[#e7e6df] p-3">
           <div className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
             Price
           </div>
-          <div className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">
+          <div className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">
             {formatPrice(
               product.price,
               product.currency,
@@ -106,12 +106,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {overviewItems.length > 0 ? (
-            <div className="border border-black bg-[#faf9f4] p-4">
+            <div className="border border-black bg-[#faf9f4] p-3">
               <ul className="space-y-2.5">
                 {overviewItems.map((item, index) => (
                   <li
                     key={index}
-                    className="flex items-start gap-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+                    className="flex items-start gap-2.5 text-[13px] leading-relaxed text-slate-700 dark:text-slate-300"
                   >
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 bg-[#ff3028]" />
                     <span>{item}</span>
@@ -126,12 +126,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        <div className="mt-5 flex items-center justify-end border-t border-slate-200/70 pt-4 dark:border-slate-700/70">
+        <div className="mt-4 flex items-center justify-end border-t border-slate-200/70 pt-3 dark:border-slate-700/70">
           <a
             href={product.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="punk-action inline-flex items-center gap-2 px-4 py-2.5 text-xs font-black transition"
+            className="punk-action inline-flex items-center gap-2 px-3 py-2 text-[11px] font-black transition"
           >
             View on Apple Store
             <svg
