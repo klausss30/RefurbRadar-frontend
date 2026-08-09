@@ -88,8 +88,15 @@ export default function Header({
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <nav className="border-t border-slate-200 bg-white px-4 py-3 lg:hidden dark:border-white/10 dark:bg-slate-950" aria-label="Mobile product categories">
+      <nav
+        className={`absolute inset-x-0 top-full border-t border-slate-200 bg-white/95 px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-[opacity,transform,visibility] duration-300 ease-out lg:hidden dark:border-white/10 dark:bg-slate-950/95 ${
+          mobileMenuOpen
+            ? 'visible translate-y-0 opacity-100'
+            : 'invisible pointer-events-none -translate-y-3 opacity-0'
+        }`}
+        aria-label="Mobile product categories"
+        aria-hidden={!mobileMenuOpen}
+      >
           <div className="mx-auto grid max-w-7xl gap-1 sm:grid-cols-2">
             {productGroups.map((group) => (
               <button
@@ -106,8 +113,7 @@ export default function Header({
               </button>
             ))}
           </div>
-        </nav>
-      )}
+      </nav>
     </header>
   );
 }
