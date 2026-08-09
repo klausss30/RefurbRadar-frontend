@@ -61,4 +61,19 @@ export function getLocale(code: string): string {
   return getCountryByCode(code)?.locale || 'en-US';
 }
 
+const MARKET_DISPLAY_CODES: Record<string, string> = {
+  bx: 'BE-NL',
+  be: 'BE-FR',
+  ca: 'CA-EN',
+  xf: 'CA-FR',
+  hk: 'HK-EN',
+  hz: 'HK-ZH',
+  cx: 'CH-DE',
+  ch: 'CH-FR',
+};
+
+export function getMarketDisplayCode(code: string): string {
+  return MARKET_DISPLAY_CODES[code] || code.toUpperCase();
+}
+
 export const DEFAULT_COUNTRY = 'nz';

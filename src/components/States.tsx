@@ -27,7 +27,7 @@ export function ErrorState({ message, onRetry }: ErrorStateProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
-      <h3 className="text-2xl font-semibold text-slate-950 dark:text-slate-50">Feed unavailable</h3>
+      <h3 className="text-2xl font-semibold text-slate-950 dark:text-slate-50">Inventory unavailable</h3>
       <p className="mb-5 mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{message}</p>
       {onRetry && (
         <button
@@ -58,4 +58,3 @@ export function EmptyState({ message = 'No products found matching your filters.
     </div>
   );
 }
-

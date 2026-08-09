@@ -1,148 +1,113 @@
-import CountrySelect from "./CountrySelect";
-import ThemeToggle from "./ThemeToggle";
-import type { Country as CountryConfig } from "../config/countries";
-import { formatRelativeTime } from "../utils/format";
-import logo from "../assets/logo.PNG";
+import { useState } from 'react';
+import CountrySelect from './CountrySelect';
+import ThemeToggle from './ThemeToggle';
+import type { Country } from '../config/countries';
+import { PRODUCT_GROUPS } from '../config/productGroups';
+import logo from '../assets/logo.PNG';
 
 interface HeaderProps {
-  countries: CountryConfig[];
-  selectedCountry: CountryConfig;
+  countries: Country[];
+  selectedCountry: Country;
   onCountryChange: (code: string) => void;
-  lastUpdated: Date | null;
+  activeGroup?: string | null;
+  onNavigateHome: () => void;
+  onNavigateGroup: (slug: string) => void;
   isDetecting?: boolean;
-  onRefresh?: () => void;
-  isLoading?: boolean;
-  activeFilterCount?: number;
-  searchQuery?: string;
 }
 
 export default function Header({
   countries,
   selectedCountry,
   onCountryChange,
-  lastUpdated,
+  activeGroup = null,
+  onNavigateHome,
+  onNavigateGroup,
   isDetecting = false,
-  onRefresh,
-  isLoading = false,
-  activeFilterCount = 0,
-  searchQuery = "",
 }: HeaderProps) {
-  const freshnessLabel = lastUpdated
-    ? `Updated ${formatRelativeTime(lastUpdated)}`
-    : "Waiting for feed";
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navigateGroup = (slug: string) => {
+    onNavigateGroup(slug);
+    setMobileMenuOpen(false);
+  };
 
   return (
-    <header className="px-4 pt-4 sm:px-6 lg:px-8 lg:pt-6">
-      <div className="mx-auto max-w-7xl">
-        <div className="glass-panel relative overflow-hidden rounded-[36px] px-5 py-6 sm:px-8 sm:py-7">
-          <div className="float-slow absolute -right-10 -top-16 h-44 w-44 rounded-full bg-sky-300/45 blur-3xl dark:bg-sky-400/15" />
-          <div className="absolute bottom-0 left-1/4 h-32 w-32 rounded-full bg-violet-300/30 blur-3xl dark:bg-violet-500/15" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent dark:via-white/20" />
+    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/80">
+      <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          onClick={onNavigateHome}
+          className="flex shrink-0 items-center gap-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          aria-label="RefurbRadar home"
+        >
+          <img src={logo} alt="" className="h-8 w-8 object-contain" />
+          <span className="hidden text-sm font-semibold tracking-tight text-slate-950 dark:text-white xl:inline">RefurbRadar</span>
+        </button>
 
-          <div className="relative">
-            {/* Top right - Theme Toggle */}
-            <div className="absolute right-6 top-6 sm:right-8 sm:top-7">
-              <ThemeToggle />
-            </div>
-
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-center pr-16 sm:pr-20">
-              <div className="flex items-center gap-4 sm:gap-5">
-                <div className="rounded-[28px] border border-white/80 bg-white/55 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_20px_40px_rgba(43,69,101,0.1)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/40 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_20px_40px_rgba(0,0,0,0.3)]">
-                  <img
-                    src={logo}
-                    alt="RefurbRadar Logo"
-                    className="h-12 w-12 object-contain sm:h-16 sm:w-16"
-                  />
-                </div>
-
-                <div className="min-w-0">
-                  <div className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
-                    Apple Refurb Tracker
-                  </div>
-                  <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-50 sm:text-[2.6rem]">
-                    RefurbRadar
-                  </h1>
-                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
-                    Apple refurbished inventory by region.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-                <div className="min-w-0">
-                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                    Country or Region
-                  </label>
-                  <div className="relative">
-                    <CountrySelect
-                      countries={countries}
-                      selectedCode={selectedCountry.code}
-                      onSelect={onCountryChange}
-                      disabled={isDetecting}
-                    />
-                    <svg
-                      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="m19 9-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-
-                {onRefresh && (
-                  <div className="flex flex-col justify-center gap-2 items-start">
-                    <button
-                      onClick={onRefresh}
-                      disabled={isLoading || isDetecting}
-                      className="flex min-h-[3rem] items-center justify-center gap-2 rounded-[18px] border border-white/20 bg-slate-950/90 px-4 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_14px_28px_rgba(15,23,42,0.18)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white/10 dark:hover:bg-sky-400/25 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_14px_28px_rgba(0,0,0,0.3)]"
-                      title="Refresh cache data"
-                    >
-                      <svg
-                        className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                        />
-                      </svg>
-                      {isLoading ? "Refreshing" : "Refresh"}
-                    </button>
-                    <div className="px-1 text-left text-xs font-medium text-slate-500 dark:text-slate-400">
-                      {freshnessLabel}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-white/40 dark:border-slate-600/40 pt-3">
-              {activeFilterCount > 0 && (
-                <span className="rounded-full border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
-                  {activeFilterCount} active filter
-                  {activeFilterCount === 1 ? "" : "s"}
-                </span>
+        <nav className="hidden items-center justify-center lg:flex" aria-label="Product categories">
+          {PRODUCT_GROUPS.map((group) => (
+            <button
+              key={group.slug}
+              type="button"
+              onClick={() => navigateGroup(group.slug)}
+              className={`relative rounded-lg px-3 py-2 text-sm transition ${
+                activeGroup === group.slug
+                  ? 'font-semibold text-slate-950 dark:text-white'
+                  : 'text-slate-600 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white'
+              }`}
+            >
+              {group.label}
+              {activeGroup === group.slug && (
+                <span className="absolute inset-x-3 -bottom-[7px] h-0.5 rounded-full bg-slate-950 dark:bg-white" />
               )}
-              {searchQuery.trim() && (
-                <span className="rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 dark:border-orange-900/50 dark:bg-orange-950/40 dark:text-orange-300">
-                  {searchQuery.trim()}
-                </span>
-              )}
-            </div>
-          </div>
+            </button>
+          ))}
+        </nav>
+
+        <div className="flex shrink-0 items-center gap-1">
+          <ThemeToggle />
+          <CountrySelect
+            countries={countries}
+            selectedCode={selectedCountry.code}
+            onSelect={onCountryChange}
+            disabled={isDetecting}
+          />
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((value) => !value)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden dark:text-slate-200 dark:hover:bg-white/10"
+            aria-label="Open product menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {mobileMenuOpen
+                ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18 18 6M6 6l12 12" />
+                : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />}
+            </svg>
+          </button>
         </div>
       </div>
+
+      {mobileMenuOpen && (
+        <nav className="border-t border-slate-200 bg-white px-4 py-3 lg:hidden dark:border-white/10 dark:bg-slate-950" aria-label="Mobile product categories">
+          <div className="mx-auto grid max-w-7xl gap-1 sm:grid-cols-2">
+            {PRODUCT_GROUPS.map((group) => (
+              <button
+                key={group.slug}
+                type="button"
+                onClick={() => navigateGroup(group.slug)}
+                className={`rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
+                  activeGroup === group.slug
+                    ? 'bg-slate-100 text-slate-950 dark:bg-white/10 dark:text-white'
+                    : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/5'
+                }`}
+              >
+                {group.label}
+              </button>
+            ))}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

@@ -1,56 +1,105 @@
-import { useEffect, useMemo } from 'react';
-import type { Category } from '../types/product';
+import { useEffect, useMemo, useState } from 'react';
+import type { Category, Product } from '../types/product';
+import type { Country } from '../config/countries';
 import { useCountry } from '../hooks/useCountry';
 import { useFeed } from '../hooks/useFeed';
 import { useProductFilters } from '../hooks/useProductFilters';
 import type { SortOption } from '../hooks/useProductFilters';
-import { DEFAULT_COUNTRY } from '../config/countries';
+import { getProductGroup, PRODUCT_GROUPS, type ProductGroup } from '../config/productGroups';
+import { formatDate } from '../utils/format';
 import SEO from '../components/SEO';
 import Header from '../components/Header';
+import ProductSection from '../components/ProductSection';
 import CategoryFilter from '../components/CategoryFilter';
 import SpecFilters from '../components/SpecFilters';
 import ProductGrid from '../components/ProductGrid';
 import Pagination from '../components/Pagination';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 
-const CATEGORY_ORDER: Category[] = [
-  'MacBook Neo',
-  'MacBook Air',
-  'MacBook Pro',
-  'iMac',
-  'Mac Mini',
-  'Mac Studio',
-  'Mac Pro',
-  'iPad',
-  'iPhone',
-  'Apple Watch',
-  'Apple TV',
-  'HomePod',
-  'Displays',
-  'Accessories',
-  'Other',
-];
-
-const SHELL_CLASS = 'relative min-h-screen pb-12 text-slate-900 dark:text-slate-100';
 const ITEMS_PER_PAGE = 24;
 
-function getInitialCategories(): Set<Category> {
-  const params = new URLSearchParams(window.location.search);
-  const categories = params
-    .getAll('category')
-    .flatMap((value) => value.split(','))
-    .filter((value): value is Category => CATEGORY_ORDER.includes(value as Category));
-
-  return new Set(categories);
+function getGroupFromUrl(): string | null {
+  const slug = new URLSearchParams(window.location.search).get('group');
+  return getProductGroup(slug) ? slug : null;
 }
 
-function getInitialSearchQuery(): string {
-  return new URLSearchParams(window.location.search).get('q') || '';
+function updateUrl(countryCode: string, groupSlug: string | null, push = false) {
+  const params = new URLSearchParams();
+  params.set('country', countryCode);
+  if (groupSlug) params.set('group', groupSlug);
+  const url = `/?${params.toString()}`;
+  window.history[push ? 'pushState' : 'replaceState'](null, '', url);
 }
 
-export default function Home() {
-  const { countryCode, country, updateCountry, isDetecting, countries } = useCountry();
-  const { products, loading, error, lastUpdated, refresh } = useFeed(countryCode, country);
+interface LandingPageProps {
+  products: Product[];
+  country: Country;
+  lastReplenishedAt: Date | null;
+  onViewAll: (slug: string) => void;
+}
+
+function LandingPage({ products, country, lastReplenishedAt, onViewAll }: LandingPageProps) {
+  const sections = useMemo(() => PRODUCT_GROUPS
+    .map((group) => ({
+      group,
+      products: products
+        .filter((product) => group.categories.includes(product.category))
+        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()),
+    }))
+    .filter((section) => section.products.length > 0), [products]);
+
+  return (
+    <>
+      <SEO
+        title={`Apple Refurbished Products in ${country.label} | RefurbRadar`}
+        description={`Browse the latest refurbished Apple products available in ${country.label}.`}
+        canonicalPath={`/?country=${country.code}`}
+        products={products}
+      />
+
+      <section className="border-b border-slate-200/70 bg-white/55 px-4 py-14 dark:border-white/10 dark:bg-slate-950/35 sm:px-6 sm:py-20 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-semibold text-blue-600 dark:text-sky-300">Apple Refurbished Store</p>
+          <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-[-0.045em] text-slate-950 dark:text-white sm:text-6xl">
+            The latest refurbished products in {country.label}.
+          </h1>
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
+            <span>{products.length} products available</span>
+            {lastReplenishedAt && <span>Latest restock {formatDate(lastReplenishedAt.toISOString())}</span>}
+          </div>
+        </div>
+      </section>
+
+      <main className="mx-auto max-w-7xl divide-y divide-slate-200/70 px-4 pb-16 sm:px-6 lg:px-8 dark:divide-white/10">
+        {sections.map(({ group, products: groupProducts }) => (
+          <ProductSection
+            key={group.slug}
+            group={group}
+            products={groupProducts}
+            onViewAll={onViewAll}
+          />
+        ))}
+      </main>
+    </>
+  );
+}
+
+interface CatalogPageProps {
+  group: ProductGroup;
+  products: Product[];
+  country: Country;
+  onBack: () => void;
+}
+
+function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
+  const groupProducts = useMemo(
+    () => products.filter((product) => group.categories.includes(product.category)),
+    [group, products],
+  );
+  const availableCategories = useMemo(
+    () => group.categories.filter((category) => groupProducts.some((product) => product.category === category)),
+    [group, groupProducts],
+  );
 
   const {
     selectedCategories,
@@ -66,201 +115,140 @@ export default function Home() {
     handleSortChange,
     handlePageChange,
     clearFilters,
-  } = useProductFilters(products, {
-    initialCategories: getInitialCategories(),
-    initialSearchQuery: getInitialSearchQuery(),
-    itemsPerPage: ITEMS_PER_PAGE,
-  });
+  } = useProductFilters(groupProducts, { itemsPerPage: ITEMS_PER_PAGE });
 
-  const handleCountryChange = (newCode: string) => {
-    updateCountry(newCode);
-    clearFilters();
-  };
-
-  const availableCategories = useMemo(() => {
-    const cats = new Set(products.map((p) => p.category));
-    return Array.from(cats).sort((a, b) => {
-      const indexA = CATEGORY_ORDER.indexOf(a);
-      const indexB = CATEGORY_ORDER.indexOf(b);
-
-      if (indexA === -1 && indexB === -1) return 0;
-      if (indexA === -1) return 1;
-      if (indexB === -1) return -1;
-      return indexA - indexB;
-    });
-  }, [products]);
-
-  const selectedCategoryList = useMemo(() => Array.from(selectedCategories), [selectedCategories]);
-  const primaryCategory = selectedCategoryList[0];
-  const pageTitle = primaryCategory
-    ? `Refurbished ${primaryCategory} Deals in ${country.label} | RefurbRadar`
-    : `Apple Refurbished Deals in ${country.label} | RefurbRadar`;
-  const pageDescription = primaryCategory
-    ? `Track refurbished ${primaryCategory} inventory, prices, and availability from the Apple Store in ${country.label}.`
-    : `Browse Apple refurbished Mac, iPad, iPhone, Apple Watch, and accessory deals from the Apple Store in ${country.label}.`;
-  const canonicalPath = useMemo(() => {
-    const params = new URLSearchParams();
-
-    if (countryCode !== DEFAULT_COUNTRY || selectedCategoryList.length > 0 || searchQuery.trim()) {
-      params.set('country', countryCode);
-    }
-
-    selectedCategoryList.forEach((category) => params.append('category', category));
-
-    if (searchQuery.trim()) {
-      params.set('q', searchQuery.trim());
-    }
-
-    const query = params.toString();
-    return query ? `/?${query}` : '/';
-  }, [countryCode, searchQuery, selectedCategoryList]);
-
-  useEffect(() => {
-    if (isDetecting) return;
-
-    window.history.replaceState(null, '', canonicalPath);
-  }, [canonicalPath, isDetecting]);
-
-  // Scroll to top when pagination changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
 
-  const handleRetry = () => {
-    updateCountry(countryCode);
-  };
-
-  if (loading || isDetecting) {
-    return (
-      <div className={SHELL_CLASS}>
-        <SEO
-          title={pageTitle}
-          description={pageDescription}
-          canonicalPath={canonicalPath}
-        />
-        <Header
-          countries={countries}
-          selectedCountry={country}
-          onCountryChange={handleCountryChange}
-          lastUpdated={null}
-          isDetecting={isDetecting}
-          onRefresh={refresh}
-          isLoading={loading}
-        />
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <LoadingState />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={SHELL_CLASS}>
-        <SEO
-          title={pageTitle}
-          description={pageDescription}
-          canonicalPath={canonicalPath}
-        />
-        <Header
-          countries={countries}
-          selectedCountry={country}
-          onCountryChange={handleCountryChange}
-          lastUpdated={null}
-          isDetecting={false}
-          onRefresh={refresh}
-          isLoading={loading}
-        />
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <ErrorState message={error} onRetry={handleRetry} />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={SHELL_CLASS}>
+    <>
       <SEO
-        title={pageTitle}
-        description={pageDescription}
-        canonicalPath={canonicalPath}
+        title={`Refurbished ${group.label} in ${country.label} | RefurbRadar`}
+        description={`${group.description} Browse current refurbished inventory in ${country.label}.`}
+        canonicalPath={`/?country=${country.code}&group=${group.slug}`}
         products={filteredProducts}
       />
+
+      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-blue-600 dark:text-slate-300 dark:hover:text-sky-300"
+        >
+          <span aria-hidden="true">←</span> Back to home
+        </button>
+
+        <div className="mt-8 border-b border-slate-200 pb-9 dark:border-white/10">
+          <p className="text-sm font-semibold text-blue-600 dark:text-sky-300">{country.label}</p>
+          <h1 className="mt-2 text-4xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-white sm:text-6xl">
+            Refurbished {group.label}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">{group.description}</p>
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">{groupProducts.length} products available</p>
+        </div>
+
+        <div className="my-8 rounded-[24px] border border-slate-200 bg-white/80 p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/70">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_15rem_auto] lg:items-end">
+            <SpecFilters searchQuery={searchQuery} onSearchChange={handleSearchChange} />
+            <div>
+              <label className="mb-2 block text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Sort</label>
+              <select
+                value={sortOption}
+                onChange={(event) => handleSortChange(event.target.value as SortOption)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-400 dark:border-white/10 dark:bg-slate-800 dark:text-slate-100"
+              >
+                <option value="newest">Newest first</option>
+                <option value="price-low">Price: low to high</option>
+                <option value="price-high">Price: high to low</option>
+              </select>
+            </div>
+            {activeFilterCount > 0 && (
+              <button type="button" onClick={clearFilters} className="rounded-full px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50 dark:text-sky-300 dark:hover:bg-sky-400/10">
+                Clear filters
+              </button>
+            )}
+          </div>
+
+          {availableCategories.length > 1 && (
+            <div className="mt-5 border-t border-slate-200 pt-5 dark:border-white/10">
+              <CategoryFilter
+                categories={availableCategories as Category[]}
+                selectedCategories={selectedCategories}
+                onToggle={handleCategoryToggle}
+              />
+            </div>
+          )}
+        </div>
+
+        {filteredProducts.length === 0
+          ? <EmptyState />
+          : (
+            <>
+              <ProductGrid products={paginatedProducts} />
+              <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+            </>
+          )}
+      </main>
+    </>
+  );
+}
+
+export default function Home() {
+  const [activeGroupSlug, setActiveGroupSlug] = useState<string | null>(getGroupFromUrl);
+  const { countryCode, country, updateCountry, isDetecting, countries } = useCountry();
+  const { products, loading, error, lastReplenishedAt, retry } = useFeed(countryCode, country);
+  const activeGroup = getProductGroup(activeGroupSlug) || null;
+
+  useEffect(() => {
+    if (!isDetecting) updateUrl(countryCode, activeGroupSlug);
+  }, [activeGroupSlug, countryCode, isDetecting]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const nextGroup = params.get('group');
+      const nextCountry = params.get('country');
+      setActiveGroupSlug(getProductGroup(nextGroup) ? nextGroup : null);
+      if (nextCountry) updateCountry(nextCountry);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [updateCountry]);
+
+  const navigateHome = () => {
+    setActiveGroupSlug(null);
+    updateUrl(countryCode, null, true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateGroup = (slug: string) => {
+    setActiveGroupSlug(slug);
+    updateUrl(countryCode, slug, true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="min-h-screen text-slate-900 dark:text-slate-100">
       <Header
         countries={countries}
         selectedCountry={country}
-        onCountryChange={handleCountryChange}
-        lastUpdated={lastUpdated}
-        isDetecting={false}
-        onRefresh={refresh}
-        isLoading={loading}
-        activeFilterCount={activeFilterCount}
-        searchQuery={searchQuery}
+        onCountryChange={updateCountry}
+        activeGroup={activeGroup?.slug}
+        onNavigateHome={navigateHome}
+        onNavigateGroup={navigateGroup}
+        isDetecting={isDetecting}
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <main className="min-w-0">
-          <div className="glass-panel mb-6 rounded-[30px] p-5 sm:p-6">
-            <div className="flex flex-col gap-6">
-              <div>
-                <CategoryFilter
-                  categories={availableCategories}
-                  selectedCategories={selectedCategories}
-                  onToggle={handleCategoryToggle}
-                />
-              </div>
-
-              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_15rem_auto] xl:items-end">
-                <div className="w-full xl:min-w-[22rem]">
-                  <SpecFilters
-                    searchQuery={searchQuery}
-                    onSearchChange={handleSearchChange}
-                  />
-                </div>
-
-                <div className="flex flex-wrap gap-3 xl:justify-start">
-                  <div className="rounded-full border border-white/70 bg-white/85 p-1 shadow-[0_12px_24px_rgba(15,23,42,0.06)] dark:border-slate-600/70 dark:bg-slate-800/85">
-                    <select
-                      value={sortOption}
-                      onChange={(e) => handleSortChange(e.target.value as SortOption)}
-                      className="min-w-[14rem] rounded-full bg-transparent px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none dark:text-slate-200"
-                    >
-                      <option value="newest">Newest First</option>
-                      <option value="price-low">Price: Low to High</option>
-                      <option value="price-high">Price: High to Low</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-3 xl:justify-end">
-                  {activeFilterCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={clearFilters}
-                      className="rounded-full border border-slate-200 bg-white/90 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 dark:border-slate-700 dark:bg-slate-800/90 dark:text-slate-200 dark:hover:border-rose-800 dark:hover:bg-slate-800 dark:hover:text-rose-400"
-                    >
-                      Clear filters
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {filteredProducts.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <>
-              <ProductGrid products={paginatedProducts} />
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </>
-          )}
-        </main>
-      </div>
+      {loading || isDetecting ? (
+        <div className="px-4 py-24"><LoadingState message={`Loading ${country.label} inventory…`} /></div>
+      ) : error ? (
+        <div className="px-4 py-24"><ErrorState message={error} onRetry={retry} /></div>
+      ) : activeGroup ? (
+        <CatalogPage key={activeGroup.slug} group={activeGroup} products={products} country={country} onBack={navigateHome} />
+      ) : (
+        <LandingPage products={products} country={country} lastReplenishedAt={lastReplenishedAt} onViewAll={navigateGroup} />
+      )}
     </div>
   );
 }

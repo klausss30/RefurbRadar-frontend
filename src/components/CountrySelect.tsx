@@ -1,7 +1,8 @@
-import type { Country as CountryConfig } from '../config/countries';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { getMarketDisplayCode, type Country } from '../config/countries';
 
 interface CountrySelectProps {
-  countries: CountryConfig[];
+  countries: Country[];
   selectedCode: string;
   onSelect: (code: string) => void;
   disabled?: boolean;
@@ -13,24 +14,108 @@ export default function CountrySelect({
   onSelect,
   disabled = false,
 }: CountrySelectProps) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const filteredCountries = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return countries;
+
+    return countries.filter((country) =>
+      country.label.toLowerCase().includes(normalized)
+      || country.code.toLowerCase().includes(normalized)
+      || country.currency.toLowerCase().includes(normalized)
+      || getMarketDisplayCode(country.code).toLowerCase().includes(normalized));
+  }, [countries, query]);
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, []);
+
+  const selectCountry = (code: string) => {
+    onSelect(code);
+    setOpen(false);
+    setQuery('');
+  };
+
   return (
-    <select
-      value={selectedCode}
-      onChange={(e) => onSelect(e.target.value)}
-      disabled={disabled}
-      className="w-full min-w-0 max-w-full appearance-none rounded-2xl border border-white/70 bg-white/65 px-4 py-3 pr-10 text-sm font-semibold text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_10px_28px_rgba(43,69,101,0.1)] outline-none backdrop-blur-2xl transition duration-200 focus:border-blue-300 focus:bg-white/85 focus:ring-4 focus:ring-blue-100/70 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-100 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.28)] dark:focus:border-sky-400/50 dark:focus:bg-slate-900/70 dark:focus:ring-sky-400/10"
-      aria-label="Select country"
-    >
-      {countries.map((country) => (
-        <option key={country.code} value={country.code}>
-          {country.label}
-        </option>
-      ))}
-    </select>
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        disabled={disabled}
+        className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-100 dark:hover:bg-white/10"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="Change country or region"
+      >
+        {getMarketDisplayCode(selectedCode)}
+        <svg className={`h-3.5 w-3.5 transition ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m19 9-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 z-50 mt-2 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2 shadow-[0_22px_70px_rgba(15,23,42,0.2)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/95">
+          <div className="relative mb-2">
+            <svg className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35m1.85-5.15a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+            </svg>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search country or region"
+              autoFocus
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:focus:border-sky-500 dark:focus:ring-sky-900"
+            />
+          </div>
+
+          <div className="max-h-80 overflow-y-auto" role="listbox" aria-label="Country or region">
+            {filteredCountries.map((country) => {
+              const selected = country.code === selectedCode;
+              return (
+                <button
+                  key={country.code}
+                  type="button"
+                  role="option"
+                  aria-selected={selected}
+                  onClick={() => selectCountry(country.code)}
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition ${
+                    selected
+                      ? 'bg-blue-50 text-blue-700 dark:bg-sky-400/10 dark:text-sky-200'
+                      : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5'
+                  }`}
+                >
+                  <span>
+                    <span className="font-semibold">{country.label}</span>
+                    <span className="ml-2 text-xs text-slate-400">{country.currency}</span>
+                  </span>
+                  <span className="flex items-center gap-2 text-xs font-semibold">
+                    {getMarketDisplayCode(country.code)}
+                    {selected && <span aria-hidden="true">✓</span>}
+                  </span>
+                </button>
+              );
+            })}
+            {filteredCountries.length === 0 && (
+              <div className="px-3 py-8 text-center text-sm text-slate-500">No matching market</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
-
-
-
-
-

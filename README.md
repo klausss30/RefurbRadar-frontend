@@ -12,10 +12,14 @@ JSON API
 React 前端 → 搜索、筛选、排序、分页和商品卡片
 ```
 
-后端负责 RSS XML 解析、价格与货币符号分离、完整型号提取、分类和数据库更新。前端负责展示与交互，并对 API 返回的商品列表做 30 分钟浏览器缓存。
+后端负责 RSS XML 解析、价格与货币符号分离、完整型号提取、分类和数据库更新。前端直接读取 API 数据，不保存商品缓存。
 
 ## 功能
 
+- Apple 风格的固定导航栏、主题按钮和可搜索的市场选择器
+- 按 Mac、iPad、iPhone、Watch 等大类组织的首页横向商品区域
+- 精简首页商品卡片，以及清晰的 Apple Store 外部链接
+- `View all` 分类完整列表、搜索、筛选、排序和分页
 - 从后端动态获取支持的国家和地区，并保留固定列表作为断网 fallback
 - 根据 URL、本地选择或 IP 自动选择 market
 - 按分类、关键词、价格和补货日期筛选
@@ -46,11 +50,11 @@ npm run dev
 ## 环境变量
 
 ```env
-VITE_API_BASE_URL=http://localhost:3001
+VITE_API_BASE_URL=
 VITE_SITE_URL=https://refurbradar.com
 ```
 
-`VITE_API_BASE_URL` 必须指向新的 .NET API，不应指向 RSS 地址。
+本地开发时留空 `VITE_API_BASE_URL`，Vite 会将 `/api` 代理到 `http://localhost:3001`。生产部署时必须将它设置为新的 .NET API 地址，不应指向 RSS 地址。
 
 ## 使用的 API
 
@@ -74,11 +78,12 @@ npm run preview
 ```text
 src/
 ├── api/backend.ts          # JSON API 客户端
-├── components/             # 页面组件
+├── components/             # 导航、横向列表、精简卡片和完整商品组件
 ├── config/countries.ts     # market fallback 配置
+├── config/productGroups.ts # 首页大类与数据库分类映射
 ├── context/                # 主题 Provider 与类型
 ├── hooks/useCountry.ts     # market 加载与自动选择
-├── hooks/useFeed.ts        # listing API 请求及缓存
+├── hooks/useFeed.ts        # 无商品缓存的 listing API 请求
 ├── hooks/useProductFilters.ts
 ├── pages/Home.tsx
 └── types/product.ts
