@@ -67,9 +67,8 @@ function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt
 
       <section className="punk-hero border-b px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <div className="relative z-10 mx-auto max-w-7xl">
-          <p className="punk-kicker">Independent Apple Refurbished Inventory Tracker</p>
-          <h1 className="punk-display mt-5 text-5xl sm:text-7xl lg:text-[6.4rem]">
-            Explore refurbished Apple<br /><span>products in {country.label}.</span>
+          <h1 className="punk-display text-5xl sm:text-7xl lg:text-[6.4rem]">
+            Apple Store Refurbished<br /><span>Devices Inventory Tracker</span>
           </h1>
           <div className="punk-meta mt-8 flex flex-wrap gap-x-6 gap-y-2 px-4 py-3 text-[11px] font-bold">
             <span>{totalProducts} products available</span>
