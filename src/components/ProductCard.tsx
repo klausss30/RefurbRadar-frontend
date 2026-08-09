@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               <img
                 src={product.imageUrl}
                 alt={product.title}
-                className="h-full w-full object-contain p-5 transition-transform duration-300 group-hover:scale-105"
+                className="h-2/3 w-2/3 object-contain transition-transform duration-300 group-hover:scale-105"
               />
               <div className="pointer-events-none absolute inset-0 bg-slate-950 opacity-0 transition-opacity duration-300 group-hover:opacity-[0.03]" />
             </>

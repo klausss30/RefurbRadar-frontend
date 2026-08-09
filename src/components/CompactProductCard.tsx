@@ -28,7 +28,7 @@ export default function CompactProductCard({ product }: CompactProductCardProps)
             src={product.imageUrl}
             alt={product.title}
             loading="lazy"
-            className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
+            className="h-2/3 w-2/3 object-contain transition duration-300 group-hover:scale-[1.03]"
           />
         ) : (
           <span className="text-sm text-slate-400">No image available</span>
