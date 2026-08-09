@@ -100,13 +100,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        <div className="flex-1">
+        <div className="flex flex-1 flex-col">
           <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
             Highlights
           </div>
 
-          {overviewItems.length > 0 ? (
-            <div className="border border-black bg-[#faf9f4] p-3">
+          <div className="flex-1 border border-black bg-[#faf9f4] p-3">
+            {overviewItems.length > 0 ? (
               <ul className="space-y-2.5">
                 {overviewItems.map((item, index) => (
                   <li
@@ -118,12 +118,12 @@ export default function ProductCard({ product }: ProductCardProps) {
                   </li>
                 ))}
               </ul>
-            </div>
-          ) : (
-            <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-              Specs are still loading in from the feed for this item.
-            </p>
-          )}
+            ) : (
+              <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                Specs are still loading in from the feed for this item.
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="mt-auto flex items-center justify-end border-t border-slate-200/70 pt-3 dark:border-slate-700/70">
