@@ -67,13 +67,13 @@ function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt
 
       <section className="punk-hero border-b px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <div className="relative z-10 mx-auto max-w-7xl">
-          <p className="punk-kicker">SYS://APPLE_REFURB_INDEX · LIVE</p>
+          <p className="punk-kicker">Apple Refurbished Store</p>
           <h1 className="punk-display mt-5 text-5xl sm:text-7xl lg:text-[6.4rem]">
-            Refurbished<br /><span>{country.label}</span>
+            The latest refurbished<br /><span>products in {country.label}.</span>
           </h1>
           <div className="punk-meta mt-8 flex flex-wrap gap-x-6 gap-y-2 px-4 py-3 text-[11px] font-bold">
-            <span>Units online: {String(totalProducts).padStart(3, '0')}</span>
-            {lastReplenishedAt && <span>Last signal: {formatDate(lastReplenishedAt.toISOString())}</span>}
+            <span>{totalProducts} products available</span>
+            {lastReplenishedAt && <span>Latest listing: {formatDate(lastReplenishedAt.toISOString())}</span>}
           </div>
         </div>
       </section>
@@ -149,7 +149,7 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
         </button>
 
         <div className="mt-8 border-b border-black pb-9">
-          <p className="punk-kicker">CATALOG://{group.slug} · {country.code}</p>
+          <p className="punk-kicker">{country.label}</p>
           <h1 className="punk-display mt-4 text-5xl sm:text-7xl">
             Refurbished {group.label}
           </h1>

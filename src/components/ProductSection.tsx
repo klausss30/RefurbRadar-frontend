@@ -10,15 +10,10 @@ interface ProductSectionProps {
 }
 
 export default function ProductSection({ group, products, total, onViewAll }: ProductSectionProps) {
-  const sectionIndex = String(
-    ['mac', 'ipad', 'iphone', 'watch', 'tv-home', 'homepod', 'displays', 'accessories'].indexOf(group.slug) + 1,
-  ).padStart(2, '0');
-
   return (
     <section className="punk-section py-10 sm:py-14" aria-labelledby={`${group.slug}-heading`}>
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <div className="punk-index mb-2">[{sectionIndex}] / PRODUCT_NODE</div>
           <h2 id={`${group.slug}-heading`} className="text-3xl font-black tracking-[-0.06em] text-black sm:text-5xl">
             {group.label}
           </h2>
@@ -31,7 +26,7 @@ export default function ProductSection({ group, products, total, onViewAll }: Pr
           onClick={() => onViewAll(group.slug)}
           className="group inline-flex shrink-0 items-center gap-1.5 border border-black bg-transparent px-3 py-2 text-xs font-black uppercase tracking-wider text-black transition hover:bg-[#ff3028] hover:text-white"
         >
-          Open index
+          View all
           <span className="transition-transform group-hover:translate-x-0.5">→</span>
         </button>
       </div>

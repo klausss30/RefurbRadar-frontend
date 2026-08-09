@@ -37,7 +37,7 @@ export default function CompactProductCard({ product }: CompactProductCardProps)
 
       <div className="flex flex-1 flex-col p-4">
         <div className="punk-index">
-          // {product.category} · {product.sku}
+          {product.category}
         </div>
         <a
           href={product.link}
@@ -61,7 +61,7 @@ export default function CompactProductCard({ product }: CompactProductCardProps)
           rel="noopener noreferrer"
           className="punk-action mt-4 inline-flex items-center justify-center gap-2 px-3 py-2 text-[11px] font-black transition focus:outline-none"
         >
-          Open Apple Store
+          View on Apple Store
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h4m0 0v4m0-4-8 8m-2 2h10a2 2 0 0 0 2-2V9" />
           </svg>
