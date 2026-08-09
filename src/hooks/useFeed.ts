@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchListings } from '../api/backend';
+import { fetchFeaturedListings, fetchGroupListings } from '../api/backend';
+import type { FeaturedListingGroup } from '../api/backend';
 import type { Product } from '../types/product';
 import type { Country } from '../config/countries';
 
-export function useFeed(countryCode: string, country: Country) {
-  const [products, setProducts] = useState<Product[]>([]);
+export function useFeaturedFeed(countryCode: string, country: Country) {
+  const [groups, setGroups] = useState<FeaturedListingGroup[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastReplenishedAt, setLastReplenishedAt] = useState<Date | null>(null);
@@ -19,12 +21,14 @@ export function useFeed(countryCode: string, country: Country) {
     async function loadListings() {
       setLoading(true);
       setError(null);
-      setProducts([]);
+      setGroups([]);
+      setTotal(0);
       setLoadedCountryCode(null);
 
       try {
-        const response = await fetchListings(countryCode, controller.signal);
-        setProducts(response.items);
+        const response = await fetchFeaturedListings(countryCode, controller.signal);
+        setGroups(response.groups);
+        setTotal(response.total);
         setLoadedCountryCode(countryCode);
         setLastReplenishedAt(
           response.lastReplenishedAt ? new Date(response.lastReplenishedAt) : null,
@@ -33,7 +37,8 @@ export function useFeed(countryCode: string, country: Country) {
         if (controller.signal.aborted) return;
         const message = caught instanceof Error ? caught.message : 'Failed to load products.';
         setError(`Unable to load products for ${country.label}. ${message}`);
-        setProducts([]);
+        setGroups([]);
+        setTotal(0);
         setLastReplenishedAt(null);
         setLoadedCountryCode(null);
       } finally {
@@ -45,5 +50,56 @@ export function useFeed(countryCode: string, country: Country) {
     return () => controller.abort();
   }, [countryCode, country.label, requestKey]);
 
-  return { products, loading, error, lastReplenishedAt, loadedCountryCode, retry };
+  return { groups, total, loading, error, lastReplenishedAt, loadedCountryCode, retry };
+}
+
+export function useGroupFeed(
+  countryCode: string,
+  groupSlug: string | null,
+  country: Country,
+) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loadedRequest, setLoadedRequest] = useState<string | null>(null);
+  const [requestKey, setRequestKey] = useState(0);
+
+  const retry = useCallback(() => setRequestKey((value) => value + 1), []);
+
+  useEffect(() => {
+    if (!groupSlug) {
+      setProducts([]);
+      setLoading(false);
+      setError(null);
+      setLoadedRequest(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    const requestId = `${countryCode}:${groupSlug}`;
+
+    async function loadGroupListings() {
+      setLoading(true);
+      setError(null);
+      setProducts([]);
+      setLoadedRequest(null);
+
+      try {
+        const response = await fetchGroupListings(countryCode, groupSlug!, controller.signal);
+        setProducts(response.items);
+        setLoadedRequest(requestId);
+      } catch (caught) {
+        if (controller.signal.aborted) return;
+        const message = caught instanceof Error ? caught.message : 'Failed to load products.';
+        setError(`Unable to load ${groupSlug} products for ${country.label}. ${message}`);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+
+    loadGroupListings();
+    return () => controller.abort();
+  }, [countryCode, country.label, groupSlug, requestKey]);
+
+  return { products, loading, error, loadedRequest, retry };
 }

@@ -9,11 +9,23 @@ interface MarketResponse {
   timezone: string;
 }
 
-interface ListingPageResponse {
+export interface ListingPageResponse {
   items: Product[];
   total: number;
   page: number;
   pageSize: number;
+  lastReplenishedAt: string | null;
+}
+
+export interface FeaturedListingGroup {
+  group: string;
+  total: number;
+  items: Product[];
+}
+
+export interface FeaturedListingsResponse {
+  groups: FeaturedListingGroup[];
+  total: number;
   lastReplenishedAt: string | null;
 }
 
@@ -57,12 +69,26 @@ export async function fetchMarkets(signal?: AbortSignal): Promise<Country[]> {
   }));
 }
 
-export async function fetchListings(
+export async function fetchFeaturedListings(
   marketCode: string,
+  signal?: AbortSignal,
+): Promise<FeaturedListingsResponse> {
+  const params = new URLSearchParams({
+    market: marketCode,
+    limit: '3',
+  });
+
+  return fetchJson<FeaturedListingsResponse>(`/api/listings/featured?${params}`, signal);
+}
+
+export async function fetchGroupListings(
+  marketCode: string,
+  groupSlug: string,
   signal?: AbortSignal,
 ): Promise<ListingPageResponse> {
   const params = new URLSearchParams({
     market: marketCode,
+    group: groupSlug,
     page: '1',
     pageSize: '1000',
   });

@@ -5,10 +5,11 @@ import ProductCarousel from './ProductCarousel';
 interface ProductSectionProps {
   group: ProductGroup;
   products: Product[];
+  total: number;
   onViewAll: (slug: string) => void;
 }
 
-export default function ProductSection({ group, products, onViewAll }: ProductSectionProps) {
+export default function ProductSection({ group, products, total, onViewAll }: ProductSectionProps) {
   return (
     <section className="py-9 sm:py-12" aria-labelledby={`${group.slug}-heading`}>
       <div className="mb-6 flex items-end justify-between gap-4">
@@ -17,7 +18,7 @@ export default function ProductSection({ group, products, onViewAll }: ProductSe
             {group.label}
           </h2>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            {products.length} {products.length === 1 ? 'product' : 'products'} available
+            {total} {total === 1 ? 'product' : 'products'} available
           </p>
         </div>
         <button
@@ -29,7 +30,7 @@ export default function ProductSection({ group, products, onViewAll }: ProductSe
           <span className="transition-transform group-hover:translate-x-0.5">→</span>
         </button>
       </div>
-      <ProductCarousel products={products.slice(0, 10)} />
+      <ProductCarousel products={products} />
     </section>
   );
 }

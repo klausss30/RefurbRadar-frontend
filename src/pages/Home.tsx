@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Category, Product } from '../types/product';
 import type { Country } from '../config/countries';
 import { useCountry } from '../hooks/useCountry';
-import { useFeed } from '../hooks/useFeed';
+import { useFeaturedFeed, useGroupFeed } from '../hooks/useFeed';
+import type { FeaturedListingGroup } from '../api/backend';
 import { useProductFilters } from '../hooks/useProductFilters';
 import type { SortOption } from '../hooks/useProductFilters';
 import { getProductGroup, PRODUCT_GROUPS, type ProductGroup } from '../config/productGroups';
@@ -32,21 +33,28 @@ function updateUrl(countryCode: string, groupSlug: string | null, push = false) 
 }
 
 interface LandingPageProps {
-  products: Product[];
+  featuredGroups: FeaturedListingGroup[];
+  totalProducts: number;
   country: Country;
   lastReplenishedAt: Date | null;
   onViewAll: (slug: string) => void;
 }
 
-function LandingPage({ products, country, lastReplenishedAt, onViewAll }: LandingPageProps) {
+function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt, onViewAll }: LandingPageProps) {
   const sections = useMemo(() => PRODUCT_GROUPS
-    .map((group) => ({
-      group,
-      products: products
-        .filter((product) => group.categories.includes(product.category))
-        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()),
-    }))
-    .filter((section) => section.products.length > 0), [products]);
+    .map((group) => {
+      const featured = featuredGroups.find((item) => item.group === group.slug);
+      return {
+        group,
+        products: featured?.items ?? [],
+        total: featured?.total ?? 0,
+      };
+    })
+    .filter((section) => section.total > 0), [featuredGroups]);
+  const featuredProducts = useMemo(
+    () => featuredGroups.flatMap((group) => group.items),
+    [featuredGroups],
+  );
 
   return (
     <>
@@ -54,7 +62,7 @@ function LandingPage({ products, country, lastReplenishedAt, onViewAll }: Landin
         title={`Apple Refurbished Products in ${country.label} | RefurbRadar`}
         description={`Browse the latest refurbished Apple products available in ${country.label}.`}
         canonicalPath={`/?country=${country.code}`}
-        products={products}
+        products={featuredProducts}
       />
 
       <section className="border-b border-slate-200/70 bg-white/55 px-4 py-14 dark:border-white/10 dark:bg-slate-950/35 sm:px-6 sm:py-20 lg:px-8">
@@ -64,18 +72,19 @@ function LandingPage({ products, country, lastReplenishedAt, onViewAll }: Landin
             The latest refurbished products in {country.label}.
           </h1>
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
-            <span>{products.length} products available</span>
+            <span>{totalProducts} products available</span>
             {lastReplenishedAt && <span>Latest listing {formatDate(lastReplenishedAt.toISOString())}</span>}
           </div>
         </div>
       </section>
 
       <main className="mx-auto max-w-7xl divide-y divide-slate-200/70 px-4 pb-16 sm:px-6 lg:px-8 dark:divide-white/10">
-        {sections.map(({ group, products: groupProducts }) => (
+        {sections.map(({ group, products: groupProducts, total }) => (
           <ProductSection
             key={group.slug}
             group={group}
             products={groupProducts}
+            total={total}
             onViewAll={onViewAll}
           />
         ))}
@@ -197,20 +206,39 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
 export default function Home() {
   const [activeGroupSlug, setActiveGroupSlug] = useState<string | null>(getGroupFromUrl);
   const { countryCode, country, updateCountry, isDetecting, countries } = useCountry();
-  const { products, loading, error, lastReplenishedAt, loadedCountryCode, retry } = useFeed(countryCode, country);
+  const {
+    groups: featuredGroups,
+    total: totalProducts,
+    loading,
+    error,
+    lastReplenishedAt,
+    loadedCountryCode,
+    retry: retryFeatured,
+  } = useFeaturedFeed(countryCode, country);
   const inventoryMatchesMarket = loadedCountryCode === countryCode;
-  const currentProducts = useMemo(
-    () => inventoryMatchesMarket ? products : [],
-    [inventoryMatchesMarket, products],
+  const currentFeaturedGroups = useMemo(
+    () => inventoryMatchesMarket ? featuredGroups : [],
+    [featuredGroups, inventoryMatchesMarket],
   );
   const inventoryLoading = loading || (!error && !inventoryMatchesMarket);
   const availableGroups = useMemo(
     () => PRODUCT_GROUPS.filter((group) =>
-      currentProducts.some((product) => group.categories.includes(product.category))),
-    [currentProducts],
+      currentFeaturedGroups.some((featured) => featured.group === group.slug && featured.total > 0)),
+    [currentFeaturedGroups],
   );
   const activeGroup = availableGroups.find((group) => group.slug === activeGroupSlug) || null;
   const effectiveGroupSlug = inventoryLoading ? activeGroupSlug : activeGroup?.slug || null;
+  const {
+    products: groupProducts,
+    loading: groupLoading,
+    error: groupError,
+    loadedRequest,
+    retry: retryGroup,
+  } = useGroupFeed(countryCode, activeGroup?.slug ?? null, country);
+  const expectedGroupRequest = activeGroup ? `${countryCode}:${activeGroup.slug}` : null;
+  const groupInventoryLoading = Boolean(activeGroup) && (
+    groupLoading || (!groupError && loadedRequest !== expectedGroupRequest)
+  );
 
   useEffect(() => {
     if (!isDetecting && !inventoryLoading) updateUrl(countryCode, effectiveGroupSlug);
@@ -242,7 +270,8 @@ export default function Home() {
 
   const handleCountryChange = (code: string) => {
     if (code === countryCode) {
-      retry();
+      retryFeatured();
+      if (activeGroup) retryGroup();
       return;
     }
 
@@ -266,11 +295,23 @@ export default function Home() {
       {inventoryLoading || isDetecting ? (
         <div className="px-4 py-24"><LoadingState message={`Loading ${country.label} inventory…`} /></div>
       ) : error ? (
-        <div className="px-4 py-24"><ErrorState message={error} onRetry={retry} /></div>
+        <div className="px-4 py-24"><ErrorState message={error} onRetry={retryFeatured} /></div>
       ) : activeGroup ? (
-        <CatalogPage key={activeGroup.slug} group={activeGroup} products={currentProducts} country={country} onBack={navigateHome} />
+        groupInventoryLoading ? (
+          <div className="px-4 py-24"><LoadingState message={`Loading all ${activeGroup.label} products in ${country.label}…`} /></div>
+        ) : groupError ? (
+          <div className="px-4 py-24"><ErrorState message={groupError} onRetry={retryGroup} /></div>
+        ) : (
+          <CatalogPage key={activeGroup.slug} group={activeGroup} products={groupProducts} country={country} onBack={navigateHome} />
+        )
       ) : (
-        <LandingPage products={currentProducts} country={country} lastReplenishedAt={lastReplenishedAt} onViewAll={navigateGroup} />
+        <LandingPage
+          featuredGroups={currentFeaturedGroups}
+          totalProducts={totalProducts}
+          country={country}
+          lastReplenishedAt={lastReplenishedAt}
+          onViewAll={navigateGroup}
+        />
       )}
     </div>
   );
