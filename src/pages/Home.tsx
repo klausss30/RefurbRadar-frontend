@@ -65,20 +65,20 @@ function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt
         products={featuredProducts}
       />
 
-      <section className="border-b border-slate-200/70 bg-white/55 px-4 py-14 dark:border-white/10 dark:bg-slate-950/35 sm:px-6 sm:py-20 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-sm font-semibold text-blue-600 dark:text-sky-300">Apple Refurbished Store</p>
-          <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-[-0.045em] text-slate-950 dark:text-white sm:text-6xl">
-            The latest refurbished products in {country.label}.
+      <section className="punk-hero border-b px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <p className="punk-kicker">SYS://APPLE_REFURB_INDEX · LIVE</p>
+          <h1 className="punk-display mt-5 text-5xl sm:text-7xl lg:text-[6.4rem]">
+            Refurbished<br /><span>{country.label}</span>
           </h1>
-          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
-            <span>{totalProducts} products available</span>
-            {lastReplenishedAt && <span>Latest listing {formatDate(lastReplenishedAt.toISOString())}</span>}
+          <div className="punk-meta mt-8 flex flex-wrap gap-x-6 gap-y-2 px-4 py-3 text-[11px] font-bold">
+            <span>Units online: {String(totalProducts).padStart(3, '0')}</span>
+            {lastReplenishedAt && <span>Last signal: {formatDate(lastReplenishedAt.toISOString())}</span>}
           </div>
         </div>
       </section>
 
-      <main className="mx-auto max-w-7xl divide-y divide-slate-200/70 px-4 pb-16 sm:px-6 lg:px-8 dark:divide-white/10">
+      <main className="mx-auto max-w-7xl divide-y divide-black/30 px-4 pb-16 sm:px-6 lg:px-8">
         {sections.map(({ group, products: groupProducts, total }) => (
           <ProductSection
             key={group.slug}
@@ -143,21 +143,21 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-blue-600 dark:text-slate-300 dark:hover:text-sky-300"
+          className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-neutral-600 transition hover:text-[#ff3028]"
         >
           <span aria-hidden="true">←</span> Back to home
         </button>
 
-        <div className="mt-8 border-b border-slate-200 pb-9 dark:border-white/10">
-          <p className="text-sm font-semibold text-blue-600 dark:text-sky-300">{country.label}</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-[-0.04em] text-slate-950 dark:text-white sm:text-6xl">
+        <div className="mt-8 border-b border-black pb-9">
+          <p className="punk-kicker">CATALOG://{group.slug} · {country.code}</p>
+          <h1 className="punk-display mt-4 text-5xl sm:text-7xl">
             Refurbished {group.label}
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">{group.description}</p>
           <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">{groupProducts.length} products available</p>
         </div>
 
-        <div className="my-8 rounded-[24px] border border-slate-200 bg-white/80 p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/70">
+        <div className="glass-panel my-8 border border-black p-5">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_15rem_auto] lg:items-end">
             <SpecFilters searchQuery={searchQuery} onSearchChange={handleSearchChange} />
             <div>
@@ -280,7 +280,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen text-slate-900 dark:text-slate-100">
+    <div className="nothing-theme min-h-screen">
       <Header
         countries={countries}
         productGroups={inventoryLoading ? [] : availableGroups}

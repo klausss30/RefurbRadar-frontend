@@ -33,16 +33,19 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/80">
+    <header className="punk-header sticky top-0 z-40 border-b backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <button
           type="button"
           onClick={onNavigateHome}
-          className="flex shrink-0 items-center gap-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="flex shrink-0 items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#ff3028]"
           aria-label="RefurbRadar home"
         >
-          <img src={logo} alt="" className="h-8 w-8 object-contain" />
-          <span className="hidden text-sm font-semibold tracking-tight text-slate-950 dark:text-white xl:inline">RefurbRadar</span>
+          <span className="relative">
+            <img src={logo} alt="" className="h-8 w-8 grayscale contrast-200 object-contain" />
+            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#ff3028]" />
+          </span>
+          <span className="hidden text-xs font-black uppercase tracking-[0.14em] text-black xl:inline">R/R</span>
         </button>
 
         <nav className="hidden items-center justify-center lg:flex" aria-label="Product categories">
@@ -51,15 +54,15 @@ export default function Header({
               key={group.slug}
               type="button"
               onClick={() => navigateGroup(group.slug)}
-              className={`relative rounded-lg px-3 py-2 text-sm transition ${
+              className={`relative px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] transition ${
                 activeGroup === group.slug
-                  ? 'font-semibold text-slate-950 dark:text-white'
-                  : 'text-slate-600 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white'
+                  ? 'text-black'
+                  : 'text-neutral-500 hover:text-black'
               }`}
             >
               {group.label}
               {activeGroup === group.slug && (
-                <span className="absolute inset-x-3 -bottom-[7px] h-0.5 rounded-full bg-slate-950 dark:bg-white" />
+                <span className="absolute inset-x-3 -bottom-[7px] h-0.5 bg-[#ff3028]" />
               )}
             </button>
           ))}
@@ -75,7 +78,7 @@ export default function Header({
           <button
             type="button"
             onClick={() => setMobileMenuOpen((value) => !value)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden dark:text-slate-200 dark:hover:bg-white/10"
+            className="inline-flex h-10 w-10 items-center justify-center border border-transparent text-black transition hover:border-black hover:bg-[#ff3028] hover:text-white lg:hidden"
             aria-label="Open product menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -89,7 +92,7 @@ export default function Header({
       </div>
 
       <nav
-        className={`absolute inset-x-0 top-full border-t border-slate-200 bg-white/95 px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-[opacity,transform,visibility] duration-300 ease-out lg:hidden dark:border-white/10 dark:bg-slate-950/95 ${
+        className={`absolute inset-x-0 top-full border-t border-black bg-[#f2f1eb]/95 px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-[opacity,transform,visibility] duration-300 ease-out lg:hidden ${
           mobileMenuOpen
             ? 'visible translate-y-0 opacity-100'
             : 'invisible pointer-events-none -translate-y-3 opacity-0'
@@ -103,10 +106,10 @@ export default function Header({
                 key={group.slug}
                 type="button"
                 onClick={() => navigateGroup(group.slug)}
-                className={`rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
+                className={`border px-4 py-3 text-left text-xs font-bold uppercase tracking-wider transition ${
                   activeGroup === group.slug
-                    ? 'bg-slate-100 text-slate-950 dark:bg-white/10 dark:text-white'
-                    : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/5'
+                    ? 'border-black bg-black text-white'
+                    : 'border-transparent text-black hover:border-black hover:bg-[#ff3028] hover:text-white'
                 }`}
               >
                 {group.label}

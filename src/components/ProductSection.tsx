@@ -10,11 +10,16 @@ interface ProductSectionProps {
 }
 
 export default function ProductSection({ group, products, total, onViewAll }: ProductSectionProps) {
+  const sectionIndex = String(
+    ['mac', 'ipad', 'iphone', 'watch', 'tv-home', 'homepod', 'displays', 'accessories'].indexOf(group.slug) + 1,
+  ).padStart(2, '0');
+
   return (
-    <section className="py-9 sm:py-12" aria-labelledby={`${group.slug}-heading`}>
+    <section className="punk-section py-10 sm:py-14" aria-labelledby={`${group.slug}-heading`}>
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 id={`${group.slug}-heading`} className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-4xl">
+          <div className="punk-index mb-2">[{sectionIndex}] / PRODUCT_NODE</div>
+          <h2 id={`${group.slug}-heading`} className="text-3xl font-black tracking-[-0.06em] text-black sm:text-5xl">
             {group.label}
           </h2>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
@@ -24,9 +29,9 @@ export default function ProductSection({ group, products, total, onViewAll }: Pr
         <button
           type="button"
           onClick={() => onViewAll(group.slug)}
-          className="group inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 dark:text-sky-300 dark:hover:bg-sky-400/10"
+          className="group inline-flex shrink-0 items-center gap-1.5 border border-black bg-transparent px-3 py-2 text-xs font-black uppercase tracking-wider text-black transition hover:bg-[#ff3028] hover:text-white"
         >
-          View all
+          Open index
           <span className="transition-transform group-hover:translate-x-0.5">→</span>
         </button>
       </div>

@@ -5,8 +5,8 @@ interface LoadingStateProps {
 export function LoadingState({ message = 'Loading products...' }: LoadingStateProps) {
   return (
     <div className="glass-panel mx-auto flex max-w-xl flex-col items-center justify-center rounded-[32px] px-8 py-14 text-center dark:bg-opacity-50">
-      <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-teal-600 shadow-[0_12px_24px_rgba(13,148,136,0.16)] dark:bg-teal-950/30 dark:text-teal-400">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-200 border-t-teal-600 dark:border-teal-800 dark:border-t-teal-400" />
+      <div className="mb-5 flex h-16 w-16 items-center justify-center border border-black bg-black text-white shadow-[6px_6px_0_rgba(255,48,40,0.3)]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-600 border-t-[#ff3028]" />
       </div>
       <h3 className="text-2xl font-semibold text-slate-950 dark:text-slate-50">Loading inventory</h3>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-600 dark:text-slate-400">{message}</p>

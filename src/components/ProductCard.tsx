@@ -15,19 +15,19 @@ export default function ProductCard({ product }: ProductCardProps) {
     : [];
 
   return (
-    <article className="soft-card group flex h-full flex-col overflow-hidden rounded-[30px] transition duration-300 hover:-translate-y-1.5 hover:border-white hover:shadow-[0_30px_70px_rgba(43,69,101,0.18)] dark:hover:border-white/20 dark:hover:shadow-[0_30px_70px_rgba(0,0,0,0.5)]">
-      <div className="relative overflow-hidden border-b border-white/60 bg-[radial-gradient(circle_at_top_right,_rgba(90,200,250,0.2),_transparent_38%),linear-gradient(160deg,_rgba(255,255,255,0.68),_rgba(235,242,251,0.5))] p-5 dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,_rgba(100,210,255,0.12),_transparent_38%),linear-gradient(160deg,_rgba(38,46,66,0.65),_rgba(16,21,33,0.55))]">
+    <article className="punk-card soft-card group flex h-full flex-col overflow-hidden transition duration-300">
+      <div className="punk-media relative overflow-hidden border-b p-5">
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.2),transparent_65%)] dark:bg-[linear-gradient(135deg,rgba(0,0,0,0.2),transparent_65%)]" />
         <div className="relative flex items-center justify-between gap-3">
-          <span className="rounded-full border border-white/80 bg-white/75 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-600 shadow-[0_10px_20px_rgba(15,23,42,0.04)] dark:border-slate-600/80 dark:bg-slate-700/75 dark:text-slate-300">
+          <span className="punk-chip px-3 py-1 text-[11px] font-bold uppercase">
             {product.category}
           </span>
-          <span className="rounded-full bg-slate-950/85 px-3 py-1 text-[11px] font-semibold text-white dark:bg-slate-800/85">
+          <span className="bg-[#ff3028] px-3 py-1 text-[11px] font-bold uppercase text-white">
             Listed {formatRelativeTime(product.publishedAt)}
           </span>
         </div>
 
-        <div className="relative mt-5 flex h-48 items-center justify-center overflow-hidden rounded-[24px] border border-white/70 bg-white/70 sm:h-56 lg:aspect-[4/3] lg:h-auto dark:border-slate-700/70 dark:bg-slate-800/70">
+        <div className="relative mt-5 flex h-48 items-center justify-center overflow-hidden border border-black bg-[#f7f6f0] sm:h-56 lg:aspect-[4/3] lg:h-auto">
           {product.imageUrl && imageStatus === 'loaded' ? (
             <>
               <img
@@ -86,7 +86,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </h3>
         </div>
 
-        <div className="mb-5 rounded-[24px] border border-white/70 bg-white/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/25 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <div className="mb-5 border border-black bg-[#e7e6df] p-4">
           <div className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
             Price
           </div>
@@ -106,14 +106,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {overviewItems.length > 0 ? (
-            <div className="rounded-[24px] border border-slate-200/80 bg-white/85 p-4 dark:border-slate-700/80 dark:bg-slate-800/85">
+            <div className="border border-black bg-[#faf9f4] p-4">
               <ul className="space-y-2.5">
                 {overviewItems.map((item, index) => (
                   <li
                     key={index}
                     className="flex items-start gap-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300"
                   >
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500 dark:bg-sky-400" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 bg-[#ff3028]" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -131,7 +131,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             href={product.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-slate-950/90 px-4 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] transition hover:-translate-y-0.5 hover:bg-blue-600 dark:bg-white/10 dark:hover:bg-sky-400/25"
+            className="punk-action inline-flex items-center gap-2 px-4 py-2.5 text-xs font-black transition"
           >
             View on Apple Store
             <svg

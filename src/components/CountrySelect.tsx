@@ -57,7 +57,7 @@ export default function CountrySelect({
         type="button"
         onClick={() => setOpen((value) => !value)}
         disabled={disabled}
-        className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-100 dark:hover:bg-white/10"
+        className="inline-flex h-10 items-center gap-1.5 border border-transparent px-3 text-xs font-black uppercase tracking-wider text-black transition hover:border-black hover:bg-[#ff3028] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Change country or region"
@@ -69,7 +69,7 @@ export default function CountrySelect({
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2 shadow-[0_22px_70px_rgba(15,23,42,0.2)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/95">
+        <div className="absolute right-0 z-50 mt-2 w-[min(21rem,calc(100vw-2rem))] overflow-hidden border border-black bg-[#f2f1eb]/95 p-2 shadow-[7px_7px_0_rgba(17,17,15,0.2)] backdrop-blur-xl">
           <div className="relative mb-2">
             <svg className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35m1.85-5.15a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
@@ -93,10 +93,10 @@ export default function CountrySelect({
                   role="option"
                   aria-selected={selected}
                   onClick={() => selectCountry(country.code)}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition ${
+                  className={`flex w-full items-center justify-between border px-3 py-2.5 text-left text-sm transition ${
                     selected
-                      ? 'bg-blue-50 text-blue-700 dark:bg-sky-400/10 dark:text-sky-200'
-                      : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5'
+                      ? 'border-black bg-black text-white'
+                      : 'border-transparent text-black hover:border-black hover:bg-[#ff3028] hover:text-white'
                   }`}
                 >
                   <span>

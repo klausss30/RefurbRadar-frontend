@@ -202,3 +202,221 @@
 :root.dark textarea:focus {
   outline: none;
 }
+
+/* RefurbRadar / industrial tech-punk visual experiment */
+.nothing-theme {
+  --punk-paper: #f2f1eb;
+  --punk-ink: #11110f;
+  --punk-red: #ff3028;
+  --punk-muted: #676761;
+  min-height: 100vh;
+  color: var(--punk-ink);
+  background-color: var(--punk-paper);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(17, 17, 15, 0.16) 1px, transparent 1.2px),
+    linear-gradient(90deg, transparent 49.8%, rgba(17, 17, 15, 0.035) 50%, transparent 50.2%);
+  background-size: 18px 18px, 100% 100%;
+  font-family: ui-monospace, 'SFMono-Regular', 'Roboto Mono', 'Courier New', monospace;
+}
+
+.nothing-theme h1,
+.nothing-theme h2,
+.nothing-theme h3,
+.nothing-theme h4,
+.nothing-theme button,
+.nothing-theme input,
+.nothing-theme select {
+  font-family: ui-monospace, 'SFMono-Regular', 'Roboto Mono', 'Courier New', monospace;
+}
+
+.nothing-theme h1,
+.nothing-theme h2 {
+  text-transform: uppercase;
+}
+
+.nothing-theme .punk-header {
+  border-color: var(--punk-ink);
+  background: rgba(242, 241, 235, 0.94);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.nothing-theme .punk-hero {
+  position: relative;
+  border-color: var(--punk-ink);
+  background:
+    linear-gradient(90deg, rgba(255, 48, 40, 0.08), transparent 32%),
+    rgba(242, 241, 235, 0.86);
+}
+
+.nothing-theme .punk-hero::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: clamp(1.25rem, 8vw, 8rem);
+  width: clamp(7rem, 18vw, 15rem);
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  border: 1px solid var(--punk-ink);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--punk-red) 0 7%, transparent 7.5%),
+    repeating-radial-gradient(circle, transparent 0 13px, rgba(17, 17, 15, 0.24) 14px 15px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.nothing-theme .punk-kicker {
+  color: var(--punk-red);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.nothing-theme .punk-display {
+  max-width: 58rem;
+  color: var(--punk-ink);
+  font-weight: 800;
+  letter-spacing: -0.075em;
+  line-height: 0.88;
+}
+
+.nothing-theme .punk-display span {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--punk-ink);
+}
+
+.nothing-theme .punk-meta {
+  width: fit-content;
+  border: 1px solid var(--punk-ink);
+  background: var(--punk-ink);
+  color: var(--punk-paper);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nothing-theme .punk-section {
+  border-color: rgba(17, 17, 15, 0.32);
+}
+
+.nothing-theme .punk-index {
+  color: var(--punk-red);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+}
+
+.nothing-theme .punk-card,
+.nothing-theme .soft-card,
+.nothing-theme .glass-panel {
+  border: 1px solid var(--punk-ink) !important;
+  border-radius: 0 !important;
+  background: rgba(248, 247, 241, 0.96) !important;
+  box-shadow: 7px 7px 0 rgba(17, 17, 15, 0.16) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.nothing-theme .punk-card {
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+}
+
+.nothing-theme .punk-card:hover,
+.nothing-theme .soft-card:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 10px 10px 0 rgba(255, 48, 40, 0.28) !important;
+}
+
+.nothing-theme .punk-media {
+  border-color: var(--punk-ink) !important;
+  border-radius: 0 !important;
+  background-color: #e7e6df !important;
+  background-image: radial-gradient(circle at 1px 1px, rgba(17, 17, 15, 0.14) 1px, transparent 1.2px) !important;
+  background-size: 14px 14px !important;
+}
+
+.nothing-theme .punk-chip {
+  border: 1px solid var(--punk-ink) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--punk-ink) !important;
+  box-shadow: none !important;
+  letter-spacing: 0.14em;
+}
+
+.nothing-theme .punk-action {
+  border: 1px solid var(--punk-ink) !important;
+  border-radius: 0 !important;
+  background: var(--punk-ink) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nothing-theme .punk-action:hover {
+  border-color: var(--punk-red) !important;
+  background: var(--punk-red) !important;
+}
+
+.nothing-theme .glass-panel button,
+.nothing-theme [aria-label^='Scroll products'] {
+  border-radius: 0 !important;
+}
+
+.nothing-theme [aria-label^='Scroll products'] {
+  border: 1px solid var(--punk-ink) !important;
+  background: var(--punk-paper) !important;
+  color: var(--punk-ink) !important;
+  box-shadow: 4px 4px 0 rgba(17, 17, 15, 0.18) !important;
+}
+
+.nothing-theme [aria-label^='Scroll products']:hover {
+  background: var(--punk-red) !important;
+  color: white !important;
+}
+
+.nothing-theme [aria-pressed='true'] {
+  border-color: var(--punk-ink) !important;
+  border-radius: 0 !important;
+  background: var(--punk-red) !important;
+  color: white !important;
+  box-shadow: 4px 4px 0 rgba(17, 17, 15, 0.18) !important;
+}
+
+.nothing-theme [aria-pressed='false'] {
+  border-color: rgba(17, 17, 15, 0.28) !important;
+  border-radius: 0 !important;
+  background: #faf9f4 !important;
+  color: var(--punk-ink) !important;
+  box-shadow: none !important;
+}
+
+.nothing-theme input,
+.nothing-theme select {
+  border-color: var(--punk-ink) !important;
+  border-radius: 0 !important;
+  background: #faf9f4 !important;
+  box-shadow: none !important;
+}
+
+.nothing-theme input:focus,
+.nothing-theme select:focus {
+  outline: 2px solid var(--punk-red) !important;
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .nothing-theme .punk-hero::after {
+    top: 1.5rem;
+    right: 1rem;
+    width: 5rem;
+    transform: none;
+    opacity: 0.55;
+  }
+
+  .nothing-theme .punk-display {
+    max-width: 82%;
+    letter-spacing: -0.055em;
+  }
+}
