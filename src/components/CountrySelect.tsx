@@ -79,7 +79,7 @@ export default function CountrySelect({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search country or region"
               autoFocus
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:focus:border-sky-500 dark:focus:ring-sky-900"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-base outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 sm:text-sm dark:border-white/10 dark:bg-slate-800 dark:text-white dark:focus:border-sky-500 dark:focus:ring-sky-900"
             />
           </div>
 
