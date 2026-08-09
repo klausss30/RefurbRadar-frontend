@@ -75,6 +75,9 @@ function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt
             <span>{totalProducts} products available</span>
             {lastReplenishedAt && <span>Latest listing: {formatDate(lastReplenishedAt.toISOString())}</span>}
           </div>
+          <p className="mt-5 max-w-2xl text-xs leading-5 text-neutral-600">
+            Availability and pricing are sourced from the Apple Refurbished Store. RefurbRadar does not sell these products; product links open the Apple Store.
+          </p>
         </div>
       </section>
 
@@ -153,8 +156,10 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
           <h1 className="punk-display mt-4 text-5xl sm:text-7xl">
             Refurbished {group.label}
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">{group.description}</p>
           <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">{groupProducts.length} products available</p>
+          <p className="mt-4 max-w-2xl text-xs leading-5 text-neutral-600">
+            Availability and pricing are sourced from the Apple Refurbished Store. RefurbRadar does not sell these products; product links open the Apple Store.
+          </p>
         </div>
 
         <div className="glass-panel my-8 border border-black p-5">

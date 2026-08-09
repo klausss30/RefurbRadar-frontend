@@ -22,7 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="punk-chip px-3 py-1 text-[11px] font-bold uppercase">
             {product.category}
           </span>
-          <span className="bg-[#ff3028] px-3 py-1 text-[11px] font-bold uppercase text-white">
+          <span className="border border-black bg-transparent px-3 py-1 text-[11px] font-bold uppercase text-black">
             Listed {formatRelativeTime(product.publishedAt)}
           </span>
         </div>
