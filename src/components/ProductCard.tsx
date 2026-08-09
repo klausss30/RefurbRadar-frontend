@@ -23,7 +23,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.category}
           </span>
           <span className="rounded-full bg-slate-950/85 px-3 py-1 text-[11px] font-semibold text-white dark:bg-slate-800/85">
-            {formatRelativeTime(product.publishedAt)}
+            Listed {formatRelativeTime(product.publishedAt)}
           </span>
         </div>
 

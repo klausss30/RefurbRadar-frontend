@@ -65,7 +65,7 @@ function LandingPage({ products, country, lastReplenishedAt, onViewAll }: Landin
           </h1>
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
             <span>{products.length} products available</span>
-            {lastReplenishedAt && <span>Latest restock {formatDate(lastReplenishedAt.toISOString())}</span>}
+            {lastReplenishedAt && <span>Latest listing {formatDate(lastReplenishedAt.toISOString())}</span>}
           </div>
         </div>
       </section>

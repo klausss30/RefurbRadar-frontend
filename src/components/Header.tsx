@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import CountrySelect from './CountrySelect';
-import ThemeToggle from './ThemeToggle';
 import type { Country } from '../config/countries';
 import { PRODUCT_GROUPS } from '../config/productGroups';
 import logo from '../assets/logo.PNG';
@@ -65,7 +64,6 @@ export default function Header({
         </nav>
 
         <div className="flex shrink-0 items-center gap-1">
-          <ThemeToggle />
           <CountrySelect
             countries={countries}
             selectedCode={selectedCountry.code}

@@ -43,7 +43,7 @@ export default function CompactProductCard({ product }: CompactProductCardProps)
           href={product.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 line-clamp-2 min-h-[3rem] text-base font-semibold leading-6 text-slate-950 transition hover:text-blue-600 dark:text-white dark:hover:text-sky-300"
+          className="mt-2 text-base font-semibold leading-6 text-slate-950 transition hover:text-blue-600 dark:text-white dark:hover:text-sky-300"
         >
           {product.title}
         </a>
@@ -52,7 +52,7 @@ export default function CompactProductCard({ product }: CompactProductCardProps)
           {price}
         </div>
         <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Restocked {formatRelativeTime(product.publishedAt)}
+          Listed {formatRelativeTime(product.publishedAt)}
         </div>
 
         <a
