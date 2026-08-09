@@ -35,8 +35,14 @@ export const PRODUCT_GROUPS: ProductGroup[] = [
   {
     slug: 'tv-home',
     label: 'Apple TV',
-    description: 'Apple TV and HomePod products for the home.',
-    categories: ['Apple TV', 'HomePod'],
+    description: 'Refurbished Apple TV models available from Apple.',
+    categories: ['Apple TV'],
+  },
+  {
+    slug: 'homepod',
+    label: 'HomePod',
+    description: 'Refurbished HomePod models available from Apple.',
+    categories: ['HomePod'],
   },
   {
     slug: 'displays',
