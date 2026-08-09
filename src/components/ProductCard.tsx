@@ -19,11 +19,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="punk-media relative overflow-hidden border-b p-4">
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.2),transparent_65%)] dark:bg-[linear-gradient(135deg,rgba(0,0,0,0.2),transparent_65%)]" />
         <div className="relative flex items-center justify-between gap-3">
-          <span className="punk-chip px-3 py-1 text-[11px] font-bold uppercase">
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-black">
             {product.category}
           </span>
-          <span className="border border-black bg-transparent px-3 py-1 text-[11px] font-bold uppercase text-black">
-            Listed {formatRelativeTime(product.publishedAt)}
+          <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-black">
+            {formatRelativeTime(product.publishedAt)}
           </span>
         </div>
 
@@ -80,7 +80,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <div className="mb-3 min-h-[6.5rem]">
+        <div data-product-title className="mb-3">
           <h3 className="text-lg font-semibold leading-tight text-slate-950 dark:text-slate-50">
             {product.title}
           </h3>
