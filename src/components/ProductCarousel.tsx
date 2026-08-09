@@ -25,7 +25,7 @@ export default function ProductCarousel({ products }: ProductCarouselProps) {
         {products.map((product) => (
           <div
             key={product.id}
-            className="flex w-[72vw] max-w-[260px] shrink-0 sm:w-[34vw] lg:w-[calc((100%-5rem)/5)] lg:max-w-none 2xl:w-[calc((100%-6.25rem)/6)]"
+            className="flex w-[86vw] max-w-[330px] shrink-0 sm:w-[46vw] lg:w-[calc((100%-2.5rem)/3)] lg:max-w-none xl:w-[calc((100%-3.75rem)/4)]"
           >
             <CompactProductCard product={product} />
           </div>
