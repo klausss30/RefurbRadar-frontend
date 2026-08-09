@@ -60,7 +60,7 @@ export default function CountrySelect({
         className="inline-flex h-10 items-center gap-1.5 border border-transparent px-3 text-xs font-black uppercase tracking-wider text-black transition hover:border-black hover:bg-[#ff3028] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Change country or region"
+        aria-label="Change Apple Store country or region"
       >
         {getMarketDisplayCode(selectedCode)}
         <svg className={`h-3.5 w-3.5 transition ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">

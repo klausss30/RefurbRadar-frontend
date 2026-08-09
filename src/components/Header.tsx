@@ -44,7 +44,7 @@ export default function Header({
           <img src={logo} alt="" className="h-8 w-8 grayscale contrast-200 object-contain" />
         </button>
 
-        <nav className="hidden items-center justify-center lg:flex" aria-label="Product categories">
+        <nav className="hidden items-center justify-center xl:flex" aria-label="Product categories">
           {productGroups.map((group) => (
             <button
               key={group.slug}
@@ -65,6 +65,9 @@ export default function Header({
         </nav>
 
         <div className="flex shrink-0 items-center gap-1">
+          <span className="px-1 text-[10px] font-black uppercase tracking-[0.1em] text-neutral-500 sm:px-2 sm:text-[11px]">
+            Apple Store
+          </span>
           <CountrySelect
             countries={countries}
             selectedCode={selectedCountry.code}
@@ -74,7 +77,7 @@ export default function Header({
           <button
             type="button"
             onClick={() => setMobileMenuOpen((value) => !value)}
-            className="inline-flex h-10 w-10 items-center justify-center border border-transparent text-black transition hover:border-black hover:bg-[#ff3028] hover:text-white lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center border border-transparent text-black transition hover:border-black hover:bg-[#ff3028] hover:text-white xl:hidden"
             aria-label="Open product menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -88,7 +91,7 @@ export default function Header({
       </div>
 
       <nav
-        className={`absolute inset-x-0 top-full border-t border-black bg-[#f2f1eb]/95 px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-[opacity,transform,visibility] duration-300 ease-out lg:hidden ${
+        className={`absolute inset-x-0 top-full border-t border-black bg-[#f2f1eb]/95 px-4 py-3 shadow-[0_18px_40px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-[opacity,transform,visibility] duration-300 ease-out xl:hidden ${
           mobileMenuOpen
             ? 'visible translate-y-0 opacity-100'
             : 'invisible pointer-events-none -translate-y-3 opacity-0'
