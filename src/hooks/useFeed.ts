@@ -8,6 +8,7 @@ export function useFeed(countryCode: string, country: Country) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastReplenishedAt, setLastReplenishedAt] = useState<Date | null>(null);
+  const [loadedCountryCode, setLoadedCountryCode] = useState<string | null>(null);
   const [requestKey, setRequestKey] = useState(0);
 
   const retry = useCallback(() => setRequestKey((value) => value + 1), []);
@@ -19,10 +20,12 @@ export function useFeed(countryCode: string, country: Country) {
       setLoading(true);
       setError(null);
       setProducts([]);
+      setLoadedCountryCode(null);
 
       try {
         const response = await fetchListings(countryCode, controller.signal);
         setProducts(response.items);
+        setLoadedCountryCode(countryCode);
         setLastReplenishedAt(
           response.lastReplenishedAt ? new Date(response.lastReplenishedAt) : null,
         );
@@ -32,6 +35,7 @@ export function useFeed(countryCode: string, country: Country) {
         setError(`Unable to load products for ${country.label}. ${message}`);
         setProducts([]);
         setLastReplenishedAt(null);
+        setLoadedCountryCode(null);
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -41,5 +45,5 @@ export function useFeed(countryCode: string, country: Country) {
     return () => controller.abort();
   }, [countryCode, country.label, requestKey]);
 
-  return { products, loading, error, lastReplenishedAt, retry };
+  return { products, loading, error, lastReplenishedAt, loadedCountryCode, retry };
 }

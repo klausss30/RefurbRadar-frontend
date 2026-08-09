@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import CountrySelect from './CountrySelect';
 import type { Country } from '../config/countries';
-import { PRODUCT_GROUPS } from '../config/productGroups';
+import type { ProductGroup } from '../config/productGroups';
 import logo from '../assets/logo.PNG';
 
 interface HeaderProps {
   countries: Country[];
+  productGroups: ProductGroup[];
   selectedCountry: Country;
   onCountryChange: (code: string) => void;
   activeGroup?: string | null;
@@ -16,6 +17,7 @@ interface HeaderProps {
 
 export default function Header({
   countries,
+  productGroups,
   selectedCountry,
   onCountryChange,
   activeGroup = null,
@@ -44,7 +46,7 @@ export default function Header({
         </button>
 
         <nav className="hidden items-center justify-center lg:flex" aria-label="Product categories">
-          {PRODUCT_GROUPS.map((group) => (
+          {productGroups.map((group) => (
             <button
               key={group.slug}
               type="button"
@@ -89,7 +91,7 @@ export default function Header({
       {mobileMenuOpen && (
         <nav className="border-t border-slate-200 bg-white px-4 py-3 lg:hidden dark:border-white/10 dark:bg-slate-950" aria-label="Mobile product categories">
           <div className="mx-auto grid max-w-7xl gap-1 sm:grid-cols-2">
-            {PRODUCT_GROUPS.map((group) => (
+            {productGroups.map((group) => (
               <button
                 key={group.slug}
                 type="button"

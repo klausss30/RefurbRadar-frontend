@@ -197,12 +197,24 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
 export default function Home() {
   const [activeGroupSlug, setActiveGroupSlug] = useState<string | null>(getGroupFromUrl);
   const { countryCode, country, updateCountry, isDetecting, countries } = useCountry();
-  const { products, loading, error, lastReplenishedAt, retry } = useFeed(countryCode, country);
-  const activeGroup = getProductGroup(activeGroupSlug) || null;
+  const { products, loading, error, lastReplenishedAt, loadedCountryCode, retry } = useFeed(countryCode, country);
+  const inventoryMatchesMarket = loadedCountryCode === countryCode;
+  const currentProducts = useMemo(
+    () => inventoryMatchesMarket ? products : [],
+    [inventoryMatchesMarket, products],
+  );
+  const inventoryLoading = loading || (!error && !inventoryMatchesMarket);
+  const availableGroups = useMemo(
+    () => PRODUCT_GROUPS.filter((group) =>
+      currentProducts.some((product) => group.categories.includes(product.category))),
+    [currentProducts],
+  );
+  const activeGroup = availableGroups.find((group) => group.slug === activeGroupSlug) || null;
+  const effectiveGroupSlug = inventoryLoading ? activeGroupSlug : activeGroup?.slug || null;
 
   useEffect(() => {
-    if (!isDetecting) updateUrl(countryCode, activeGroupSlug);
-  }, [activeGroupSlug, countryCode, isDetecting]);
+    if (!isDetecting && !inventoryLoading) updateUrl(countryCode, effectiveGroupSlug);
+  }, [countryCode, effectiveGroupSlug, inventoryLoading, isDetecting]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -228,26 +240,37 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCountryChange = (code: string) => {
+    if (code === countryCode) {
+      retry();
+      return;
+    }
+
+    setActiveGroupSlug(null);
+    updateCountry(code);
+  };
+
   return (
     <div className="min-h-screen text-slate-900 dark:text-slate-100">
       <Header
         countries={countries}
+        productGroups={inventoryLoading ? [] : availableGroups}
         selectedCountry={country}
-        onCountryChange={updateCountry}
+        onCountryChange={handleCountryChange}
         activeGroup={activeGroup?.slug}
         onNavigateHome={navigateHome}
         onNavigateGroup={navigateGroup}
         isDetecting={isDetecting}
       />
 
-      {loading || isDetecting ? (
+      {inventoryLoading || isDetecting ? (
         <div className="px-4 py-24"><LoadingState message={`Loading ${country.label} inventory…`} /></div>
       ) : error ? (
         <div className="px-4 py-24"><ErrorState message={error} onRetry={retry} /></div>
       ) : activeGroup ? (
-        <CatalogPage key={activeGroup.slug} group={activeGroup} products={products} country={country} onBack={navigateHome} />
+        <CatalogPage key={activeGroup.slug} group={activeGroup} products={currentProducts} country={country} onBack={navigateHome} />
       ) : (
-        <LandingPage products={products} country={country} lastReplenishedAt={lastReplenishedAt} onViewAll={navigateGroup} />
+        <LandingPage products={currentProducts} country={country} lastReplenishedAt={lastReplenishedAt} onViewAll={navigateGroup} />
       )}
     </div>
   );
