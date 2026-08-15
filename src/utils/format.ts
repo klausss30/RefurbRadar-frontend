@@ -102,6 +102,32 @@ export function formatRelativeTime(date: Date | string): string {
 }
 
 /**
+ * Formats elapsed calendar days in a market's local timezone.
+ * This treats a listing from yesterday as "1 day ago" even when fewer than
+ * 24 hours have elapsed.
+ */
+export function formatCalendarDaysAgo(date: Date | string, timezone: string): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const formatter = new Intl.DateTimeFormat('en', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  });
+
+  const toDayNumber = (value: Date) => {
+    const parts = formatter.formatToParts(value);
+    const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+      Number(parts.find((part) => part.type === type)?.value);
+    return Date.UTC(getPart('year'), getPart('month') - 1, getPart('day')) / 86_400_000;
+  };
+
+  const days = Math.max(0, Math.round(toDayNumber(new Date()) - toDayNumber(dateObj)));
+  if (days === 0) return 'Today';
+  return `${days} day${days === 1 ? '' : 's'} ago`;
+}
+
+/**
  * Creates a stable hash from multiple strings
  */
 export function createHash(...strings: string[]): string {

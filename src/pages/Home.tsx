@@ -3,11 +3,11 @@ import type { Category, Product } from '../types/product';
 import type { Country } from '../config/countries';
 import { useCountry } from '../hooks/useCountry';
 import { useFeaturedFeed, useGroupFeed } from '../hooks/useFeed';
-import type { FeaturedListingGroup } from '../api/backend';
+import type { FeaturedArrivalGroup, FeaturedListingGroup } from '../api/backend';
 import { useProductFilters } from '../hooks/useProductFilters';
 import type { SortOption } from '../hooks/useProductFilters';
 import { getProductGroup, PRODUCT_GROUPS, type ProductGroup } from '../config/productGroups';
-import { formatDate } from '../utils/format';
+import { formatCalendarDaysAgo } from '../utils/format';
 import SEO from '../components/SEO';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -38,10 +38,11 @@ interface LandingPageProps {
   totalProducts: number;
   country: Country;
   lastReplenishedAt: Date | null;
+  todayArrivals: FeaturedArrivalGroup[];
   onViewAll: (slug: string) => void;
 }
 
-function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt, onViewAll }: LandingPageProps) {
+function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt, todayArrivals, onViewAll }: LandingPageProps) {
   const sections = useMemo(() => PRODUCT_GROUPS
     .map((group) => {
       const featured = featuredGroups.find((item) => item.group === group.slug);
@@ -75,7 +76,25 @@ function LandingPage({ featuredGroups, totalProducts, country, lastReplenishedAt
           </h1>
           <div className="punk-meta mt-5 flex flex-wrap gap-x-6 gap-y-2 px-3 py-2.5 text-[10px] font-bold sm:mt-8 sm:px-4 sm:py-3 sm:text-[11px]">
             <span>{totalProducts} products available</span>
-            {lastReplenishedAt && <span>Latest listing: {formatDate(lastReplenishedAt.toISOString())}</span>}
+          </div>
+          <div className="punk-arrivals mt-3 flex max-w-2xl flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2.5 sm:px-4 sm:py-3">
+            {todayArrivals.length > 0 ? (
+              <>
+                <span className="punk-arrivals-label">Today&apos;s arrivals</span>
+                <div className="flex flex-wrap gap-2">
+                  {todayArrivals.map((arrival) => (
+                    <span key={arrival.group} className="punk-arrivals-chip">
+                      {getProductGroup(arrival.group)?.label ?? arrival.group}
+                      <strong>+{arrival.count}</strong>
+                    </span>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <span className="punk-arrivals-label">
+                Last arrival: <strong>{lastReplenishedAt ? formatCalendarDaysAgo(lastReplenishedAt, country.timezone) : 'No arrivals recorded'}</strong>
+              </span>
+            )}
           </div>
           <p className="mt-3 max-w-2xl text-[11px] leading-4 text-neutral-600 sm:mt-5 sm:text-xs sm:leading-5">
             RefurbRadar does not sell these products. Availability and pricing are sourced from the Apple Refurbished Store; browse what is available here, then continue to Apple Store to purchase.
@@ -218,6 +237,7 @@ export default function Home() {
     loading,
     error,
     lastReplenishedAt,
+    todayArrivals,
     loadedCountryCode,
     retry: retryFeatured,
   } = useFeaturedFeed(countryCode, country);
@@ -317,6 +337,7 @@ export default function Home() {
             totalProducts={totalProducts}
             country={country}
             lastReplenishedAt={lastReplenishedAt}
+            todayArrivals={todayArrivals}
             onViewAll={navigateGroup}
           />
         )}

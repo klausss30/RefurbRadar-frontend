@@ -325,6 +325,36 @@
   text-transform: uppercase;
 }
 
+.nothing-theme .punk-arrivals {
+  border: 1px solid var(--punk-ink);
+  background: rgba(248, 247, 241, 0.88);
+  color: var(--punk-ink);
+  text-transform: uppercase;
+}
+
+.nothing-theme .punk-arrivals-label {
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.nothing-theme .punk-arrivals-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-left: 2px solid var(--punk-red);
+  padding: 0.2rem 0.45rem;
+  background: rgba(17, 17, 15, 0.07);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.nothing-theme .punk-arrivals-chip strong {
+  color: var(--punk-red);
+  font-size: 0.78rem;
+}
+
 .nothing-theme .punk-section {
   border-color: rgba(17, 17, 15, 0.32);
 }

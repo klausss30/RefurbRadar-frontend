@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchFeaturedListings, fetchGroupListings } from '../api/backend';
-import type { FeaturedListingGroup } from '../api/backend';
+import type { FeaturedArrivalGroup, FeaturedListingGroup } from '../api/backend';
 import type { Product } from '../types/product';
 import type { Country } from '../config/countries';
 
@@ -10,6 +10,7 @@ export function useFeaturedFeed(countryCode: string, country: Country) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastReplenishedAt, setLastReplenishedAt] = useState<Date | null>(null);
+  const [todayArrivals, setTodayArrivals] = useState<FeaturedArrivalGroup[]>([]);
   const [loadedCountryCode, setLoadedCountryCode] = useState<string | null>(null);
   const [requestKey, setRequestKey] = useState(0);
 
@@ -23,6 +24,7 @@ export function useFeaturedFeed(countryCode: string, country: Country) {
       setError(null);
       setGroups([]);
       setTotal(0);
+      setTodayArrivals([]);
       setLoadedCountryCode(null);
 
       try {
@@ -33,6 +35,7 @@ export function useFeaturedFeed(countryCode: string, country: Country) {
         setLastReplenishedAt(
           response.lastReplenishedAt ? new Date(response.lastReplenishedAt) : null,
         );
+        setTodayArrivals(response.todayArrivals ?? []);
       } catch (caught) {
         if (controller.signal.aborted) return;
         const message = caught instanceof Error ? caught.message : 'Failed to load products.';
@@ -40,6 +43,7 @@ export function useFeaturedFeed(countryCode: string, country: Country) {
         setGroups([]);
         setTotal(0);
         setLastReplenishedAt(null);
+        setTodayArrivals([]);
         setLoadedCountryCode(null);
       } finally {
         if (!controller.signal.aborted) setLoading(false);
@@ -50,7 +54,7 @@ export function useFeaturedFeed(countryCode: string, country: Country) {
     return () => controller.abort();
   }, [countryCode, country.label, requestKey]);
 
-  return { groups, total, loading, error, lastReplenishedAt, loadedCountryCode, retry };
+  return { groups, total, loading, error, lastReplenishedAt, todayArrivals, loadedCountryCode, retry };
 }
 
 export function useGroupFeed(

@@ -23,10 +23,16 @@ export interface FeaturedListingGroup {
   items: Product[];
 }
 
+export interface FeaturedArrivalGroup {
+  group: string;
+  count: number;
+}
+
 export interface FeaturedListingsResponse {
   groups: FeaturedListingGroup[];
   total: number;
   lastReplenishedAt: string | null;
+  todayArrivals?: FeaturedArrivalGroup[];
 }
 
 function getApiBaseUrl(): string {
