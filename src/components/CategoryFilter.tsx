@@ -1,31 +1,12 @@
 import { useState } from 'react';
-import type { Category } from '../types/product';
 
 interface CategoryFilterProps {
-  categories: Category[];
-  selectedCategories: Set<Category>;
-  onToggle: (category: Category) => void;
+  categories: string[];
+  selectedCategories: Set<string>;
+  onToggle: (category: string) => void;
   collapsible?: boolean; // Whether to make it collapsible on mobile
   defaultCollapsed?: boolean; // Default collapsed state
 }
-
-const CATEGORY_LABELS: Record<Category, string> = {
-  'iPad': 'iPad',
-  'iPhone': 'iPhone',
-  'MacBook Neo': 'MacBook Neo',
-  'MacBook Air': 'MacBook Air',
-  'MacBook Pro': 'MacBook Pro',
-  'iMac': 'iMac',
-  'Mac Mini': 'Mac Mini',
-  'Mac Studio': 'Mac Studio',
-  'Mac Pro': 'Mac Pro',
-  'Apple Watch': 'Apple Watch',
-  'Apple TV': 'Apple TV',
-  'HomePod': 'HomePod',
-  'Displays': 'Displays',
-  'Accessories': 'Accessories',
-  'Other': 'Other',
-};
 
 export default function CategoryFilter({
   categories,
@@ -53,7 +34,7 @@ export default function CategoryFilter({
         >
           <span className="flex items-center gap-3">
             <span className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
-              Category
+              Model
             </span>
             {selectedCount > 0 && (
               <span className="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-bold text-blue-700 dark:bg-sky-400/15 dark:text-sky-200">
@@ -80,7 +61,7 @@ export default function CategoryFilter({
       ) : (
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
-            Category
+            Model
           </h3>
           {selectedCount > 0 && (
             <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white dark:bg-white/15 dark:text-slate-100">
@@ -107,7 +88,7 @@ export default function CategoryFilter({
                 : 'border-white/70 bg-white/55 text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl hover:border-blue-200 hover:bg-white/85 hover:text-blue-700 dark:border-white/10 dark:bg-slate-900/35 dark:text-slate-300 dark:hover:border-sky-400/30 dark:hover:bg-slate-800/70 dark:hover:text-sky-200'
             }`}
           >
-            {CATEGORY_LABELS[category]}
+            {category}
           </button>
         ))}
       </div>

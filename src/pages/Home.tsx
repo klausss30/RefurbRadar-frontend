@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { Category, Product } from '../types/product';
+import type { Product } from '../types/product';
 import type { Country } from '../config/countries';
 import { useCountry } from '../hooks/useCountry';
 import { useFeaturedFeed, useGroupFeed } from '../hooks/useFeed';
@@ -19,6 +19,8 @@ import Pagination from '../components/Pagination';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 
 const ITEMS_PER_PAGE = 24;
+const IPAD_FAMILY_ORDER = ['iPad Pro', 'iPad Air', 'iPad mini', 'iPad'];
+const MODEL_COLLATOR = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
 
 function getGroupFromUrl(): string | null {
   const slug = new URLSearchParams(window.location.search).get('group');
@@ -129,9 +131,27 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
     () => products.filter((product) => group.categories.includes(product.category)),
     [group, products],
   );
-  const availableCategories = useMemo(
-    () => group.categories.filter((category) => groupProducts.some((product) => product.category === category)),
-    [group, groupProducts],
+  const availableProductFamilies = useMemo(
+    () => {
+      const families = Array.from(new Set(groupProducts.map((product) =>
+        product.productFamily || product.category)));
+
+      if (group.slug === 'ipad') {
+        return families.sort((left, right) => {
+          const leftIndex = IPAD_FAMILY_ORDER.indexOf(left);
+          const rightIndex = IPAD_FAMILY_ORDER.indexOf(right);
+          return (leftIndex < 0 ? Number.MAX_SAFE_INTEGER : leftIndex)
+            - (rightIndex < 0 ? Number.MAX_SAFE_INTEGER : rightIndex);
+        });
+      }
+
+      if (group.slug === 'iphone') {
+        return families.sort((left, right) => MODEL_COLLATOR.compare(right, left));
+      }
+
+      return families;
+    },
+    [group.slug, groupProducts],
   );
 
   const {
@@ -204,10 +224,10 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
             )}
           </div>
 
-          {availableCategories.length > 1 && (
+          {availableProductFamilies.length > 1 && (
             <div className="mt-5 border-t border-slate-200 pt-5 dark:border-white/10">
               <CategoryFilter
-                categories={availableCategories as Category[]}
+                categories={availableProductFamilies}
                 selectedCategories={selectedCategories}
                 onToggle={handleCategoryToggle}
               />

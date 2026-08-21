@@ -37,7 +37,7 @@ export default function CompactProductCard({ product }: CompactProductCardProps)
 
       <div className="flex flex-1 flex-col p-5">
         <div className="punk-index">
-          {product.category}
+          {product.productFamily || product.category}
         </div>
         <a
           href={product.link}

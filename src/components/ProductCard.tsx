@@ -20,7 +20,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.2),transparent_65%)] dark:bg-[linear-gradient(135deg,rgba(0,0,0,0.2),transparent_65%)]" />
         <div className="relative flex items-center justify-between gap-3">
           <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-black">
-            {product.category}
+            {product.productFamily || product.category}
           </span>
           <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-black">
             {formatRelativeTime(product.publishedAt)}

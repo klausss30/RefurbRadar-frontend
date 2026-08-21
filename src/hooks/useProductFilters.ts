@@ -1,10 +1,10 @@
 import { useMemo, useState, useCallback } from 'react';
-import type { Product, Category } from '../types/product';
+import type { Product } from '../types/product';
 
 export type SortOption = 'newest' | 'price-low' | 'price-high';
 
 interface UseProductFiltersOptions {
-  initialCategories?: Set<Category>;
+  initialCategories?: Set<string>;
   initialSearchQuery?: string;
   initialSortOption?: SortOption;
   itemsPerPage?: number;
@@ -21,7 +21,7 @@ export function useProductFilters(
     itemsPerPage = 24,
   } = options;
 
-  const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(initialCategories);
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(initialCategories);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [sortOption, setSortOption] = useState<SortOption>(initialSortOption);
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,7 +32,7 @@ export function useProductFilters(
 
     // Apply category filter
     if (selectedCategories.size > 0) {
-      filtered = filtered.filter((p) => selectedCategories.has(p.category));
+      filtered = filtered.filter((p) => selectedCategories.has(p.productFamily || p.category));
     }
 
     // Apply search filter
@@ -41,7 +41,8 @@ export function useProductFilters(
       filtered = filtered.filter((p) => {
         const titleMatch = p.title.toLowerCase().includes(query);
         const specsMatch = p.specsText?.toLowerCase().includes(query);
-        return titleMatch || specsMatch;
+        const familyMatch = p.productFamily?.toLowerCase().includes(query);
+        return titleMatch || specsMatch || familyMatch;
       });
     }
 
@@ -72,7 +73,7 @@ export function useProductFilters(
   const activeFilterCount = selectedCategories.size + (searchQuery.trim() ? 1 : 0);
 
   // Handler callbacks
-  const handleCategoryToggle = useCallback((category: Category) => {
+  const handleCategoryToggle = useCallback((category: string) => {
     setSelectedCategories((prev) => {
       const next = new Set(prev);
       if (next.has(category)) {

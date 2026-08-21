@@ -64,6 +64,7 @@ export interface Product {
   country: Country;
   title: string;
   category: Category;
+  productFamily?: string;
   price: number;
   currency: Currency;
   currencySymbol: string;
