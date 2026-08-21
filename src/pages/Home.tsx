@@ -22,6 +22,20 @@ const ITEMS_PER_PAGE = 24;
 const IPAD_FAMILY_ORDER = ['iPad Pro', 'iPad Air', 'iPad mini', 'iPad'];
 const MODEL_COLLATOR = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
 
+function compareWatchFamilies(left: string, right: string): number {
+  const getRank = (family: string) => {
+    const typeRank = family.includes('Series') ? 0 : family.includes('Ultra') ? 1 : family.includes('SE') ? 2 : 3;
+    const generation = Number(family.match(/\d+/)?.[0] ?? 0);
+    return { typeRank, generation };
+  };
+
+  const leftRank = getRank(left);
+  const rightRank = getRank(right);
+  return leftRank.typeRank - rightRank.typeRank
+    || rightRank.generation - leftRank.generation
+    || MODEL_COLLATOR.compare(left, right);
+}
+
 function getGroupFromUrl(): string | null {
   const slug = new URLSearchParams(window.location.search).get('group');
   return getProductGroup(slug) ? slug : null;
@@ -147,6 +161,10 @@ function CatalogPage({ group, products, country, onBack }: CatalogPageProps) {
 
       if (group.slug === 'iphone') {
         return families.sort((left, right) => MODEL_COLLATOR.compare(right, left));
+      }
+
+      if (group.slug === 'watch') {
+        return families.sort(compareWatchFamilies);
       }
 
       return families;
